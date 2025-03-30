@@ -1,4 +1,6 @@
-import { View, Text, TextInput, Button, Alert } from "react-native";
+// 📁 app/(auth)/signupNicknameScreen.tsx
+
+import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 
@@ -20,25 +22,45 @@ export default function SignupNicknameScreen() {
     };
 
     return (
-        <View style={{ padding: 20 }}>
-            <Text style={{ fontSize: 20, marginBottom: 20 }}>닉네임을 입력해주세요</Text>
+        <View style={{ width: "100%", paddingHorizontal: 24 }}>
+            <Text
+                style={{
+                    fontSize: 20,
+                    marginBottom: 12,
+                    fontFamily: "Pretendard-Bold",
+                    textAlign: "center",
+                }}
+            >
+                닉네임을 입력해주세요
+            </Text>
 
             <TextInput
                 placeholder="예: 유지어터짱"
                 value={nickname}
                 onChangeText={setNickname}
-                style={inputStyle}
+                style={{
+                    fontFamily: "Pretendard-Bold",
+                    borderWidth: 1,
+                    borderColor: "#6A4FB6",
+                    padding: 12,
+                    borderRadius: 8,
+                    marginBottom: 20,
+                    width: "100%",
+                }}
             />
 
-            <Button title="다음" onPress={handleNext} />
+            <TouchableOpacity onPress={handleNext}>
+                <Text
+                    style={{
+                        color: "#6A4FB6",
+                        fontSize: 16,
+                        fontFamily: "Pretendard-Bold",
+                        textAlign: "center",
+                    }}
+                >
+                    다음
+                </Text>
+            </TouchableOpacity>
         </View>
     );
 }
-
-const inputStyle = {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 16,
-};

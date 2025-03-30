@@ -1,4 +1,6 @@
-import { View, Text, TextInput, Button, Alert } from "react-native";
+// 📁 app/(auth)/loginScreen.tsx
+
+import { View, Text, TextInput, Alert, TouchableOpacity } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
@@ -19,9 +21,17 @@ export default function LoginScreen() {
     };
 
     return (
-        <View style={{ padding: 20 }}>
-            <Text style={{ fontSize: 20, marginBottom: 20 }}>비밀번호를 입력해주세요</Text>
-            <Text style={{ marginBottom: 20 }}>{email}</Text>
+        <View style={{ width: "100%", paddingHorizontal: 24 }}>
+            <Text
+                style={{
+                    fontSize: 20,
+                    marginBottom: 12,
+                    fontFamily: "Pretendard-Bold",
+                    textAlign: "center",
+                }}
+            >
+                비밀번호를 입력해주세요
+            </Text>
 
             <TextInput
                 placeholder="비밀번호"
@@ -29,15 +39,28 @@ export default function LoginScreen() {
                 value={password}
                 onChangeText={setPassword}
                 style={{
+                    fontFamily: "Pretendard-Bold",
+                    width: "100%",
                     borderWidth: 1,
-                    borderColor: "#ccc",
+                    borderColor: "#6A4FB6",
                     padding: 12,
                     borderRadius: 8,
                     marginBottom: 20,
                 }}
             />
 
-            <Button title="로그인" onPress={handleLogin} />
+            <TouchableOpacity onPress={handleLogin}>
+                <Text
+                    style={{
+                        color: "#6A4FB6",
+                        fontSize: 16,
+                        fontFamily: "Pretendard-Bold",
+                        textAlign: "center",
+                    }}
+                >
+                    로그인
+                </Text>
+            </TouchableOpacity>
         </View>
     );
 }

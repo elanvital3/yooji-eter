@@ -1,9 +1,10 @@
-// app/(auth)/EmailScreen.tsx
-console.log("🔥auth 진입 !!")
-import { View, Text, TextInput, Button, Alert } from "react-native";
+// 📁 app/(auth)/index.tsx
+
+import { TextInput, TouchableOpacity, Text, View, Alert } from "react-native";
 import { useState } from "react";
 import { useRouter } from "expo-router";
 import { checkUserExists } from "../../utils/checkUserExists";
+import CustomText from "../../components/CustomText";
 
 export default function EmailScreen() {
     const [email, setEmail] = useState("");
@@ -15,26 +16,17 @@ export default function EmailScreen() {
             return;
         }
 
-        try {
-            const exists = await checkUserExists(email);
-            console.log("✅ 이메일 존재 여부:", exists);
-
-            if (exists) {
-                // 기존 사용자 → 로그인 화면
-                router.push(`/(auth)/loginScreen?email=${encodeURIComponent(email)}`);
-            } else {
-                // 신규 사용자 → 회원가입 시작
-                router.push(`/(auth)/signupPasswordScreen?email=${encodeURIComponent(email)}`);
-            }
-        } catch (error) {
-            console.error("이메일 확인 중 에러:", error);
-            Alert.alert("에러", "이메일 확인 중 문제가 발생했습니다.");
+        const exists = await checkUserExists(email);
+        if (exists) {
+            router.push(`/(auth)/loginScreen?email=${encodeURIComponent(email)}`);
+        } else {
+            router.push(`/(auth)/signupPasswordScreen?email=${encodeURIComponent(email)}`);
         }
     };
 
     return (
-        <View style={{ padding: 20 }}>
-            <Text style={{ fontSize: 20, marginBottom: 12 }}>이메일을 입력해주세요</Text>
+        <View style={{ width: "100%" }}>
+            <Text style={{ fontSize: 20, marginBottom: 12, fontFamily: "Pretendard-Bold", textAlign: "center", }}>이메일을 입력해주세요</Text>
 
             <TextInput
                 placeholder="you@example.com"
@@ -43,15 +35,22 @@ export default function EmailScreen() {
                 value={email}
                 onChangeText={setEmail}
                 style={{
+                    fontFamily: "Pretendard-Bold",
+                    width: "100%",
                     borderWidth: 1,
-                    borderColor: "#ccc",
+                    borderColor: "#6A4FB6",
                     padding: 12,
                     borderRadius: 8,
                     marginBottom: 20,
+
                 }}
             />
 
-            <Button title="다음" onPress={handleNext} />
+            <TouchableOpacity onPress={handleNext}>
+                <Text style={{ color: "#6A4FB6", fontSize: 16, fontFamily: "Pretendard-Bold", textAlign: "center", }}>
+                    다음
+                </Text>
+            </TouchableOpacity>
         </View>
     );
 }

@@ -1,4 +1,6 @@
-import { View, Text, TextInput, Button, Alert } from "react-native";
+// 📁 app/(auth)/signupHeightScreen.tsx
+
+import { View, Text, TextInput, Alert, TouchableOpacity } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
@@ -25,7 +27,6 @@ export default function SignupHeightScreen() {
                 password as string
             );
 
-            // Firestore에 추가 정보 저장
             await setDoc(doc(db, "users", userCredential.user.uid), {
                 nickname,
                 height: Number(height),
@@ -41,26 +42,46 @@ export default function SignupHeightScreen() {
     };
 
     return (
-        <View style={{ padding: 20 }}>
-            <Text style={{ fontSize: 20, marginBottom: 20 }}>키를 입력해주세요 (cm)</Text>
+        <View style={{ width: "100%", paddingHorizontal: 24 }}>
+            <Text
+                style={{
+                    fontSize: 20,
+                    marginBottom: 12,
+                    fontFamily: "Pretendard-Bold",
+                    textAlign: "center",
+                }}
+            >
+                키를 입력해주세요 (cm)
+            </Text>
 
             <TextInput
                 placeholder="예: 175"
                 value={height}
                 onChangeText={setHeight}
                 keyboardType="numeric"
-                style={inputStyle}
+                style={{
+                    fontFamily: "Pretendard-Bold",
+                    borderWidth: 1,
+                    borderColor: "#6A4FB6",
+                    padding: 12,
+                    borderRadius: 8,
+                    marginBottom: 20,
+                    width: "100%",
+                }}
             />
 
-            <Button title="회원가입 완료" onPress={handleSignup} />
+            <TouchableOpacity onPress={handleSignup}>
+                <Text
+                    style={{
+                        color: "#6A4FB6",
+                        fontSize: 16,
+                        fontFamily: "Pretendard-Bold",
+                        textAlign: "center",
+                    }}
+                >
+                    회원가입 완료
+                </Text>
+            </TouchableOpacity>
         </View>
     );
 }
-
-const inputStyle = {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 16,
-};

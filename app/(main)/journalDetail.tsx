@@ -7,18 +7,17 @@ import {
     StyleSheet,
     ActivityIndicator,
     Alert,
-    Platform,
 } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { db } from "../../firebase/config";
 import {
     doc,
     getDoc,
-    updateDoc,
-    collection,
     setDoc,
+    collection,
+    getDocs,
 } from "firebase/firestore";
-import DateTimePicker from "@react-native-community/datetimepicker";
+import { Calendar, DateData } from "react-native-calendars";
 
 type ChecklistItem = {
     title: string;
@@ -30,12 +29,11 @@ export default function JournalDetailScreen() {
     const [type, setType] = useState("");
     const [startedAt, setStartedAt] = useState<Date | null>(null);
     const [checklist, setChecklist] = useState<ChecklistItem[]>([]);
-    const [loading, setLoading] = useState(true);
-
     const [selectedDate, setSelectedDate] = useState(new Date());
-    const [showDatePicker, setShowDatePicker] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [point, setPoint] = useState(0);
 
-    const dateKey = selectedDate.toISOString().slice(0, 10); // '2025-04-03'
+    const dateKey = selectedDate.toISOString().slice(0, 10); // e.g. "2025-04-03"
 
     useEffect(() => {
         const fetchData = async () => {
@@ -52,6 +50,19 @@ export default function JournalDetailScreen() {
             const journalData = journalSnap.data();
             setType(journalData.type);
             setStartedAt(journalData.startedAt.toDate());
+
+            // 총 점수 계산
+            const logsSnapshot = await getDocs(collection(db, `journals/${journalId}/dailyLogs`));
+            let totalPoints = 0;
+            logsSnapshot.forEach((doc) => {
+                const items: ChecklistItem[] = doc.data().checklist || [];
+                const checkedCount = items.filter((item) => item.checked).length;
+                totalPoints += checkedCount;
+                if (checkedCount === items.length && items.length > 0) {
+                    totalPoints += 3; // 보너스
+                }
+            });
+            setPoint(totalPoints);
 
             const dailyLogRef = doc(db, `journals/${journalId}/dailyLogs/${dateKey}`);
             const dailySnap = await getDoc(dailyLogRef);
@@ -96,11 +107,6 @@ export default function JournalDetailScreen() {
         }
     };
 
-    const handleDateChange = (event: any, selected?: Date) => {
-        setShowDatePicker(false);
-        if (selected) setSelectedDate(selected);
-    };
-
     if (loading || !startedAt) return <ActivityIndicator size="large" />;
 
     const dayNumber =
@@ -110,48 +116,36 @@ export default function JournalDetailScreen() {
 
     return (
         <View style={styles.container}>
-            {/* 📁 app/(main)/journalDetail.tsx 내부 날짜 표시 영역 대체 */}
-
-            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
-                <TouchableOpacity onPress={() => setSelectedDate(prev => {
-                    const newDate = new Date(prev);
-                    newDate.setDate(newDate.getDate() - 1);
-                    return newDate;
-                })}>
-                    <Text style={{ fontSize: 24, paddingHorizontal: 16 }}>⬅️</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity onPress={() => setShowDatePicker(true)}>
-                    <View style={{ alignItems: "center" }}>
-                        <Text style={{ fontSize: 16, fontWeight: "bold" }}>
-                            📘 {type || "다이어트"} 유지일기 — Day {dayNumber}
-                        </Text>
-                        <Text style={{ fontSize: 14, color: "#555", textAlign: "center" }}>
-                            {selectedDate.toISOString().slice(0, 10)}
-                        </Text>
-                    </View>
-                </TouchableOpacity>
-
-                <TouchableOpacity onPress={() => setSelectedDate(prev => {
-                    const newDate = new Date(prev);
-                    newDate.setDate(newDate.getDate() + 1);
-                    return newDate;
-                })}>
-                    <Text style={{ fontSize: 24, paddingHorizontal: 16 }}>➡️</Text>
-                </TouchableOpacity>
+            {/* ✅ 상단 정보 */}
+            <View style={styles.infoRow}>
+                <Text style={styles.infoText}>📘 {type}</Text>
+                <Text style={styles.infoText}>Day {dayNumber}</Text>
+                <Text style={styles.infoText}>🔥 {point}pt</Text>
             </View>
 
-            {showDatePicker && (
-                <DateTimePicker
-                    value={selectedDate}
-                    mode="date"
-                    display={Platform.OS === "ios" ? "spinner" : "default"}
-                    onChange={handleDateChange}
-                    maximumDate={new Date()} // 미래 선택 방지
-                />
-            )}
+            {/* ✅ 달력 */}
+            <Calendar
+                current={selectedDate.toISOString().slice(0, 10)}
+                onDayPress={(day: DateData) => {
+                    const selected = new Date(day.dateString);
+                    setSelectedDate(selected);
+                }}
+                markedDates={{
+                    [selectedDate.toISOString().slice(0, 10)]: {
+                        selected: true,
+                        selectedColor: "#00adf5",
+                    },
+                }}
+                maxDate={new Date().toISOString().slice(0, 10)}
+                style={styles.calendar}
+                theme={{
+                    textDayFontSize: 14,
+                    textMonthFontSize: 14,
+                    textDayHeaderFontSize: 12,
+                }}
+            />
 
-            {/* 체크리스트 */}
+            {/* ✅ 체크리스트 */}
             <View style={styles.list}>
                 {checklist.map((item, index) => (
                     <TouchableOpacity
@@ -171,8 +165,17 @@ export default function JournalDetailScreen() {
 
 const styles = StyleSheet.create({
     container: { flex: 1, padding: 20 },
-    title: { fontSize: 20, fontWeight: "bold", marginBottom: 4 },
-    subtitle: { fontSize: 14, color: "#666", marginBottom: 20 },
+    infoRow: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        marginBottom: 12,
+    },
+    infoText: { fontSize: 16, fontWeight: "600" },
+    calendar: {
+        borderRadius: 8,
+        elevation: 2,
+        marginBottom: 20,
+    },
     list: { gap: 14 },
     itemRow: {
         paddingVertical: 8,
