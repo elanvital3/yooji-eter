@@ -14,7 +14,7 @@ export default function SignupNicknameScreen() {
         }
 
         router.push({
-            pathname: "/(auth)/SignupHeightScreen",
+            pathname: "/(auth)/signupHeightScreen",
             params: { email, password, nickname },
         } as any);
     };

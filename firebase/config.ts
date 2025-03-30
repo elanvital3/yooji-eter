@@ -1,6 +1,12 @@
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth"; // ✅ initializeAuth 안 씀
+import {
+    initializeAuth,
+    getReactNativePersistence,
+} from "firebase/auth";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getFirestore } from "firebase/firestore";
 
+// 🔐 Firebase 설정
 const firebaseConfig = {
     apiKey: "AIzaSyAP9e9e6OGgsLb-yxEjuyC8vr98J7dssnY",
     authDomain: "yooji-eter-8780c.firebaseapp.com",
@@ -11,7 +17,15 @@ const firebaseConfig = {
     measurementId: "G-E201R8BL8R",
 };
 
+// ✅ Firebase 초기화
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app); // ✅ 단순 버전으로 변경
 
-export { auth };
+// ✅ 로그인 상태 유지가 적용된 Auth
+const auth = initializeAuth(app, {
+    persistence: getReactNativePersistence(AsyncStorage),
+});
+
+// ✅ Firestore 초기화
+const db = getFirestore(app);
+
+export { auth, db };

@@ -1,5 +1,6 @@
-import { Stack } from "expo-router";
+// app/_layout.tsx
+import { Slot } from "expo-router";
 
-export default function AuthLayout() {
-  return <Stack />; // initialRouteName 없이!
+export default function RootLayout() {
+  return <Slot />;
 }

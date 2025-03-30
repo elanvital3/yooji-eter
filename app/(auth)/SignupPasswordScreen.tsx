@@ -19,7 +19,7 @@ export default function SignupPasswordScreen() {
         }
 
         router.push({
-            pathname: "/(auth)/SignupNicknameScreen",
+            pathname: "/(auth)/signupNicknameScreen",
             params: { email, password },
         } as any);
     };

@@ -2,5 +2,5 @@
 import { Stack } from "expo-router";
 
 export default function AuthLayout() {
-    return <Stack />; // ✅ initialRouteName 제거!
+    return <Stack />;
 }

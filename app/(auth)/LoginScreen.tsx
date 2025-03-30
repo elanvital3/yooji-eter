@@ -12,7 +12,7 @@ export default function LoginScreen() {
     const handleLogin = async () => {
         try {
             await signInWithEmailAndPassword(auth, email as string, password);
-            router.replace("/main/HomeScreen");
+            router.replace("/(main)");
         } catch (error: any) {
             Alert.alert("로그인 실패", error.message);
         }

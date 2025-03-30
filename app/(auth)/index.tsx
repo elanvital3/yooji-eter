@@ -1,8 +1,9 @@
+// app/(auth)/EmailScreen.tsx
+console.log("🔥auth 진입 !!")
 import { View, Text, TextInput, Button, Alert } from "react-native";
 import { useState } from "react";
-import { fetchSignInMethodsForEmail } from "firebase/auth";
-import { auth } from "../../firebase/config";
 import { useRouter } from "expo-router";
+import { checkUserExists } from "../../utils/checkUserExists";
 
 export default function EmailScreen() {
     const [email, setEmail] = useState("");
@@ -15,17 +16,15 @@ export default function EmailScreen() {
         }
 
         try {
-            console.log("🧪 SignIn methods for email:", email);
-            const methods = await fetchSignInMethodsForEmail(auth, "test3@gmail.com");
-            console.log("🧪 SignIn methods for email:", methods);
-            console.log("🔥 현재 auth 객체 상태:", auth);
+            const exists = await checkUserExists(email);
+            console.log("✅ 이메일 존재 여부:", exists);
 
-            if (methods.includes("password")) {
+            if (exists) {
                 // 기존 사용자 → 로그인 화면
-                router.push(`/(auth)/LoginScreen?email=${encodeURIComponent(email)}`);
+                router.push(`/(auth)/loginScreen?email=${encodeURIComponent(email)}`);
             } else {
                 // 신규 사용자 → 회원가입 시작
-                router.push(`/(auth)/SignupPasswordScreen?email=${encodeURIComponent(email)}`);
+                router.push(`/(auth)/signupPasswordScreen?email=${encodeURIComponent(email)}`);
             }
         } catch (error) {
             console.error("이메일 확인 중 에러:", error);
