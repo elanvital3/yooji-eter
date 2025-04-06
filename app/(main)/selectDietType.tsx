@@ -1,4 +1,4 @@
-// app/(main)/selectDietType.tsx
+// 📁 app/(main)/selectDietType.tsx
 import { View, Text, TouchableOpacity, StyleSheet, Button } from "react-native";
 import { useState } from "react";
 import { useRouter } from "expo-router";
@@ -35,28 +35,65 @@ export default function SelectDietTypeScreen() {
                     ]}
                     onPress={() => setSelected(option.key)}
                 >
-                    <Text style={styles.cardText}>{option.label}</Text>
+                    <Text
+                        style={[
+                            styles.cardText,
+                            selected === option.key && styles.selectedText,
+                        ]}
+                    >
+                        {option.label}
+                    </Text>
                 </TouchableOpacity>
             ))}
 
-            <Button title="다음" onPress={handleNext} disabled={!selected} />
+            <Button
+                title="다음"
+                onPress={handleNext}
+                disabled={!selected}
+                color={selected ? "#6A4FB6" : "#ccc"} // 선택된 상태일 때 버튼 색상
+            />
         </View>
     );
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, padding: 20 },
-    title: { fontSize: 20, marginBottom: 20 },
+    container: {
+        flex: 1,
+        padding: 20,
+        backgroundColor: "#F7F3FF", // 배경색 (auth와 동일하게 유지)
+    },
+    title: {
+        fontSize: 20,
+        marginBottom: 20,
+        fontFamily: "Pretendard-Bold",
+        textAlign: "center",
+    },
     card: {
         padding: 16,
         backgroundColor: "#eee",
         borderRadius: 10,
         marginBottom: 12,
+        alignItems: "center",
+        justifyContent: "center",
+        fontFamily: "Pretendard-Bold",
+        borderWidth: 1,
+        borderColor: "#ddd",
     },
     selectedCard: {
-        backgroundColor: "#a5d6a7",
-        borderColor: "#2e7d32",
+        backgroundColor: "#6A4FB6", // 선택된 카드의 색상 (보라색)
+        borderColor: "#fff", // 선택된 카드 테두리 색상 (흰색)
         borderWidth: 2,
+        elevation: 8, // 그림자 효과 (Android)
+        shadowColor: "#000", // 그림자 색상 (iOS)
+        shadowOffset: { width: 0, height: 4 }, // 그림자 위치
+        shadowOpacity: 0.3, // 그림자 투명도
+        shadowRadius: 4, // 그림자 크기
     },
-    cardText: { fontSize: 16 },
+    cardText: {
+        fontSize: 16,
+        fontFamily: "Pretendard-Bold",
+    },
+    selectedText: {
+        color: "#fff", // 선택된 카드의 텍스트 색상 (흰색)
+    },
 });

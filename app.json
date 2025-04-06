@@ -3,6 +3,11 @@
     "name": "yooji-eter",
     "slug": "yooji-eter",
     "scheme": "yooji-eter",
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -20,10 +25,18 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/favicon.png",
+      "build": {
+        "babel": {
+          "include": [
+            "react-native-web"
+          ]
+        }
+      }
     },
     "fonts": {
-      "Pretendard-Regular": "./assets/fonts/Pretendard-Regular.ttf"
+      "Pretendard-Regular": "./assets/fonts/Pretendard-Regular.ttf",
+      "Pretendard-Bold": "./assets/fonts/Pretendard-Bold.ttf"
     },
     "plugins": [
       "expo-router",

@@ -37,19 +37,31 @@ export default function InputStartWeightScreen() {
                 style={styles.input}
             />
 
-            <Button title="다음" onPress={handleNext} disabled={!weight} />
+            <Button
+                title="다음"
+                onPress={handleNext}
+                disabled={!weight}
+                color={weight ? "#6A4FB6" : "#ccc"} // 보라색 버튼
+            />
         </View>
     );
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, padding: 20 },
-    title: { fontSize: 18, marginBottom: 16 },
+    container: { flex: 1, padding: 20, backgroundColor: "#F7F3FF" }, // 배경색
+    title: {
+        fontSize: 18,
+        marginBottom: 16,
+        fontFamily: "Pretendard-Bold",
+        textAlign: "center",
+        color: "#6A4FB6", // 보라색 텍스트
+    },
     input: {
         borderWidth: 1,
-        borderColor: "#ccc",
+        borderColor: "#6A4FB6", // 보라색 테두리
         borderRadius: 8,
         padding: 12,
         marginBottom: 20,
+        fontFamily: "Pretendard-Bold",
     },
 });

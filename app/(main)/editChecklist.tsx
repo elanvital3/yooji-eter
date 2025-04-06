@@ -164,18 +164,33 @@ export default function EditChecklistScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, padding: 20 },
-    title: { fontSize: 20, marginBottom: 16 },
+    container: { flex: 1, padding: 20, backgroundColor: "#F7F3FF" }, // 배경색
+    title: {
+        fontSize: 20,
+        marginBottom: 16,
+        fontFamily: "Pretendard-Bold",
+        textAlign: "center",
+        color: "#6A4FB6", // 보라색 텍스트
+    },
     itemRow: {
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
         paddingVertical: 8,
         borderBottomWidth: 1,
-        borderColor: "#ccc",
+        borderColor: "#6A4FB6", // 보라색 테두리
+        marginBottom: 12,
     },
-    itemText: { fontSize: 16 },
-    editText: { fontSize: 18 },
+    itemText: {
+        fontSize: 16,
+        fontFamily: "Pretendard-Bold",
+        color: "#6A4FB6", // 보라색 텍스트
+    },
+    editText: {
+        fontSize: 18,
+        fontFamily: "Pretendard-Bold",
+        color: "#6A4FB6",
+    },
     deleteText: { fontSize: 18, color: "red" },
     saveText: { color: "green", marginLeft: 8 },
     cancelText: { color: "gray", marginLeft: 8 },
@@ -194,7 +209,7 @@ const styles = StyleSheet.create({
     input: {
         flex: 1,
         borderWidth: 1,
-        borderColor: "#ccc",
+        borderColor: "#6A4FB6", // 보라색 테두리
         borderRadius: 8,
         paddingHorizontal: 10,
         paddingVertical: 8,

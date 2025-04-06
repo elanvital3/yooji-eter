@@ -133,7 +133,7 @@ export default function JournalDetailScreen() {
                 markedDates={{
                     [selectedDate.toISOString().slice(0, 10)]: {
                         selected: true,
-                        selectedColor: "#00adf5",
+                        selectedColor: "#6A4FB6",
                     },
                 }}
                 maxDate={new Date().toISOString().slice(0, 10)}
@@ -142,6 +142,7 @@ export default function JournalDetailScreen() {
                     textDayFontSize: 14,
                     textMonthFontSize: 14,
                     textDayHeaderFontSize: 12,
+                    arrowColor: "#6A4FB6",
                 }}
             />
 
@@ -164,24 +165,24 @@ export default function JournalDetailScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, padding: 20 },
+    container: { flex: 1, padding: 20, backgroundColor: "#F7F3FF" }, // 배경색 추가
     infoRow: {
         flexDirection: "row",
         justifyContent: "space-between",
         marginBottom: 12,
     },
-    infoText: { fontSize: 16, fontWeight: "600" },
+    infoText: { fontSize: 16, fontWeight: "600", color: "#6A4FB6" },
     calendar: {
         borderRadius: 8,
         elevation: 2,
-        marginBottom: 20,
+        marginBottom: 10, // 간격 조정
     },
-    list: { gap: 14 },
+    list: { gap: 8 }, // 간격 좁힘
     itemRow: {
-        paddingVertical: 8,
+        paddingVertical: 6, // 간격 좁힘
         borderBottomWidth: 1,
         borderColor: "#eee",
     },
-    itemText: { fontSize: 18 },
+    itemText: { fontSize: 18, color: "#555" },
     checked: { textDecorationLine: "line-through", color: "#999" },
 });
