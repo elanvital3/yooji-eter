@@ -1,7 +1,7 @@
-// 📁 app/(main)/selectDietType.tsx
 import { View, Text, TouchableOpacity, StyleSheet, Button } from "react-native";
 import { useState } from "react";
 import { useRouter } from "expo-router";
+import { Colors } from "../../constants/Colors"; // Colors 임포트
 
 const dietOptions = [
     { key: "switch_on", label: "스위치온" },
@@ -50,7 +50,7 @@ export default function SelectDietTypeScreen() {
                 title="다음"
                 onPress={handleNext}
                 disabled={!selected}
-                color={selected ? "#6A4FB6" : "#ccc"} // 선택된 상태일 때 버튼 색상
+                color={selected ? Colors.light.tint : "#ccc"} // 선택된 상태일 때 버튼 색상
             />
         </View>
     );
@@ -60,13 +60,14 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 20,
-        backgroundColor: "#F7F3FF", // 배경색 (auth와 동일하게 유지)
+        backgroundColor: Colors.light.background, // 배경색 (auth와 동일하게 유지)
     },
     title: {
         fontSize: 20,
         marginBottom: 20,
         fontFamily: "Pretendard-Bold",
         textAlign: "center",
+        color: Colors.light.tint, // 텍스트 색상 보라색
     },
     card: {
         padding: 16,
@@ -80,7 +81,7 @@ const styles = StyleSheet.create({
         borderColor: "#ddd",
     },
     selectedCard: {
-        backgroundColor: "#6A4FB6", // 선택된 카드의 색상 (보라색)
+        backgroundColor: Colors.light.tint, // 선택된 카드의 색상 (보라색)
         borderColor: "#fff", // 선택된 카드 테두리 색상 (흰색)
         borderWidth: 2,
         elevation: 8, // 그림자 효과 (Android)
@@ -92,6 +93,7 @@ const styles = StyleSheet.create({
     cardText: {
         fontSize: 16,
         fontFamily: "Pretendard-Bold",
+        color: Colors.light.text, // 텍스트 색상 (진한 회색)
     },
     selectedText: {
         color: "#fff", // 선택된 카드의 텍스트 색상 (흰색)

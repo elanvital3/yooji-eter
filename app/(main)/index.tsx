@@ -1,5 +1,3 @@
-// 📁 app/(main)/index.tsx
-
 import { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from "react-native";
 import { collection, query, where, getDocs } from "firebase/firestore";
@@ -9,8 +7,7 @@ import { useRouter } from "expo-router";
 import CustomText from "../../components/CustomText";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons"; // react-native-vector-icons 설치 필요
 import { AntDesign } from '@expo/vector-icons';
-// import { FaBook } from 'react-icons/fa';
-
+import { Colors } from "../../constants/Colors"; // Colors 임포트
 
 type Journal = {
     id: string;
@@ -62,21 +59,12 @@ export default function HomeScreen() {
     };
 
     return (
-        <View
-            style={{
-                flex: 1,
-                justifyContent: "center",
-                alignItems: "center",
-                padding: 24,
-                backgroundColor: "#F7F3FF", // auth 배경색과 동일
-            }}
-        >
+        <View style={styles.container}>
             {/* 진행 중인 유지일기 정보 */}
             {journal ? (
                 <TouchableOpacity
                     style={styles.journalCard}
                     onPress={() => {
-                        // 로그로 journalId 확인하기
                         console.log("Navigating to journalDetail with ID:", journal.id);
                         router.push({
                             pathname: "/(main)/journalDetail",
@@ -84,9 +72,7 @@ export default function HomeScreen() {
                         } as any);
                     }}
                 >
-                    {/* <Icon name="book-open" size={30} color="#6A4FB6" style={styles.icon} /> */}
-
-                    <AntDesign name="book" size={30} color="#6A4FB6" style={styles.icon} />
+                    <AntDesign name="book" size={30} color={Colors.light.tint} style={styles.icon} />
 
                     <View style={styles.journalInfo}>
                         <Text style={styles.journalType}>{journal.type}</Text>
@@ -96,13 +82,7 @@ export default function HomeScreen() {
             ) : (
                 <View>
                     <Text
-                        style={{
-                            fontSize: 18,
-                            marginBottom: 12,
-                            color: "#555",
-                            textAlign: "center",
-                            fontFamily: "Pretendard-Bold",
-                        }}
+                        style={styles.noJournalText}
                     >
                         진행 중인 유지일기가 없습니다.
                     </Text>
@@ -112,34 +92,26 @@ export default function HomeScreen() {
             <View>
                 <TouchableOpacity
                     onPress={() => router.push("/(main)/selectDietType")}
-                    style={{
-                        backgroundColor: "#6A4FB6", // 버튼 배경색
-                        paddingVertical: 12,
-                        paddingHorizontal: 24,
-                        borderRadius: 8,
-                    }}
+                    style={styles.startButton}
                 >
-                    <Text
-                        style={{
-                            color: "#fff",
-                            fontSize: 16,
-                            fontFamily: "Pretendard-Bold",
-                            textAlign: "center",
-                        }}
-                    >
-                        유지일기 시작하기
-                    </Text>
+                    <Text style={styles.startButtonText}>유지일기 시작하기</Text>
                 </TouchableOpacity>
             </View>
-
         </View>
     );
 }
 
 const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        padding: 24,
+        backgroundColor: Colors.light.background, // 배경색 연한 보라색
+    },
     journalCard: {
         flexDirection: "row",
-        backgroundColor: "#fff",
+        backgroundColor: Colors.light.background, // 배경색 흰색
         padding: 20,
         borderRadius: 10,
         width: "100%",
@@ -159,10 +131,29 @@ const styles = StyleSheet.create({
     journalType: {
         fontSize: 18,
         fontWeight: "bold",
-        color: "#6A4FB6",
+        color: Colors.light.tint, // 진한 보라색
     },
     dDay: {
         fontSize: 16,
         color: "#777",
+    },
+    noJournalText: {
+        fontSize: 18,
+        marginBottom: 12,
+        color: Colors.light.text, // 진한 회색
+        textAlign: "center",
+        fontFamily: "Pretendard-Bold",
+    },
+    startButton: {
+        backgroundColor: Colors.light.tint, // 버튼 배경색
+        paddingVertical: 12,
+        paddingHorizontal: 24,
+        borderRadius: 8,
+    },
+    startButtonText: {
+        color: "#fff",
+        fontSize: 16,
+        fontFamily: "Pretendard-Bold",
+        textAlign: "center",
     },
 });

@@ -1,6 +1,7 @@
 // 📁 app/(auth)/_layout.tsx
 import { Slot } from "expo-router";
 import { Image, View, StyleSheet } from "react-native";
+import { Colors } from "../../constants/Colors"
 
 export default function AuthLayout() {
     return (
@@ -20,7 +21,7 @@ export default function AuthLayout() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#F7F3FF",
+        backgroundColor: Colors.light.background,
         alignItems: "center",
         paddingHorizontal: 24,
         paddingTop: 100, // 위에 공간 줘서 캐릭터 띄우기

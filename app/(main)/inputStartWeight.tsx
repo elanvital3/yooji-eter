@@ -1,7 +1,7 @@
-// 📁 파일 경로: app/(main)/inputStartWeight.tsx
 import { View, Text, TextInput, Button, StyleSheet, Alert } from "react-native";
 import { useState } from "react";
 import { useRouter, useLocalSearchParams } from "expo-router";
+import { Colors } from "../../constants/Colors"; // Colors 임포트
 
 export default function InputStartWeightScreen() {
     const [weight, setWeight] = useState("");
@@ -41,24 +41,28 @@ export default function InputStartWeightScreen() {
                 title="다음"
                 onPress={handleNext}
                 disabled={!weight}
-                color={weight ? "#6A4FB6" : "#ccc"} // 보라색 버튼
+                color={weight ? Colors.light.tint : "#ccc"} // 보라색 버튼
             />
         </View>
     );
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, padding: 20, backgroundColor: "#F7F3FF" }, // 배경색
+    container: {
+        flex: 1,
+        padding: 20,
+        backgroundColor: Colors.light.background, // 배경색
+    },
     title: {
         fontSize: 18,
         marginBottom: 16,
         fontFamily: "Pretendard-Bold",
         textAlign: "center",
-        color: "#6A4FB6", // 보라색 텍스트
+        color: Colors.light.tint, // 보라색 텍스트
     },
     input: {
         borderWidth: 1,
-        borderColor: "#6A4FB6", // 보라색 테두리
+        borderColor: Colors.light.tint, // 보라색 테두리
         borderRadius: 8,
         padding: 12,
         marginBottom: 20,

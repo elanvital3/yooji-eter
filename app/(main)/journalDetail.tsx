@@ -1,4 +1,3 @@
-// 📁 app/(main)/journalDetail.tsx
 import { useEffect, useState } from "react";
 import {
     View,
@@ -18,6 +17,7 @@ import {
     getDocs,
 } from "firebase/firestore";
 import { Calendar, DateData } from "react-native-calendars";
+import { Colors } from "../../constants/Colors"; // Colors 임포트
 
 type ChecklistItem = {
     title: string;
@@ -133,7 +133,7 @@ export default function JournalDetailScreen() {
                 markedDates={{
                     [selectedDate.toISOString().slice(0, 10)]: {
                         selected: true,
-                        selectedColor: "#6A4FB6",
+                        selectedColor: Colors.light.tint,
                     },
                 }}
                 maxDate={new Date().toISOString().slice(0, 10)}
@@ -142,7 +142,7 @@ export default function JournalDetailScreen() {
                     textDayFontSize: 14,
                     textMonthFontSize: 14,
                     textDayHeaderFontSize: 12,
-                    arrowColor: "#6A4FB6",
+                    arrowColor: Colors.light.tint,
                 }}
             />
 
@@ -165,13 +165,13 @@ export default function JournalDetailScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, padding: 20, backgroundColor: "#F7F3FF" }, // 배경색 추가
+    container: { flex: 1, padding: 20, backgroundColor: Colors.light.background }, // 배경색 추가
     infoRow: {
         flexDirection: "row",
         justifyContent: "space-between",
         marginBottom: 12,
     },
-    infoText: { fontSize: 16, fontWeight: "600", color: "#6A4FB6" },
+    infoText: { fontSize: 16, fontWeight: "600", color: Colors.light.tint }, // 보라색 글씨
     calendar: {
         borderRadius: 8,
         elevation: 2,
@@ -183,6 +183,6 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderColor: "#eee",
     },
-    itemText: { fontSize: 18, color: "#555" },
+    itemText: { fontSize: 18, color: "#555" }, // 기본 텍스트 색상
     checked: { textDecorationLine: "line-through", color: "#999" },
 });

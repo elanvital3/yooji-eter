@@ -1,4 +1,3 @@
-// 📁 파일 경로: app/(main)/editChecklist.tsx
 import {
     View,
     Text,
@@ -13,6 +12,7 @@ import { useEffect, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { auth, db } from "../../firebase/config";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { Colors } from "../../constants/Colors"; // Colors 임포트
 
 const CHECKLIST_PRESETS: Record<string, string[]> = {
     switch_on: [
@@ -164,13 +164,13 @@ export default function EditChecklistScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, padding: 20, backgroundColor: "#F7F3FF" }, // 배경색
+    container: { flex: 1, padding: 20, backgroundColor: Colors.light.background }, // 배경색
     title: {
         fontSize: 20,
         marginBottom: 16,
         fontFamily: "Pretendard-Bold",
         textAlign: "center",
-        color: "#6A4FB6", // 보라색 텍스트
+        color: Colors.light.tint, // 보라색 텍스트
     },
     itemRow: {
         flexDirection: "row",
@@ -178,18 +178,18 @@ const styles = StyleSheet.create({
         alignItems: "center",
         paddingVertical: 8,
         borderBottomWidth: 1,
-        borderColor: "#6A4FB6", // 보라색 테두리
+        borderColor: Colors.light.tint, // 보라색 테두리
         marginBottom: 12,
     },
     itemText: {
         fontSize: 16,
         fontFamily: "Pretendard-Bold",
-        color: "#6A4FB6", // 보라색 텍스트
+        color: Colors.light.tint, // 보라색 텍스트
     },
     editText: {
         fontSize: 18,
         fontFamily: "Pretendard-Bold",
-        color: "#6A4FB6",
+        color: Colors.light.tint,
     },
     deleteText: { fontSize: 18, color: "red" },
     saveText: { color: "green", marginLeft: 8 },
@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
     input: {
         flex: 1,
         borderWidth: 1,
-        borderColor: "#6A4FB6", // 보라색 테두리
+        borderColor: Colors.light.tint, // 보라색 테두리
         borderRadius: 8,
         paddingHorizontal: 10,
         paddingVertical: 8,

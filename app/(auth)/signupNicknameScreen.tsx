@@ -1,8 +1,9 @@
 // 📁 app/(auth)/signupNicknameScreen.tsx
 
-import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
+import { Colors } from "../../constants/Colors"; // Colors 임포트
 
 export default function SignupNicknameScreen() {
     const { email, password } = useLocalSearchParams();
@@ -22,45 +23,48 @@ export default function SignupNicknameScreen() {
     };
 
     return (
-        <View style={{ width: "100%", paddingHorizontal: 24 }}>
-            <Text
-                style={{
-                    fontSize: 20,
-                    marginBottom: 12,
-                    fontFamily: "Pretendard-Bold",
-                    textAlign: "center",
-                }}
-            >
-                닉네임을 입력해주세요
-            </Text>
+        <View style={styles.container}>
+            <Text style={styles.title}>닉네임을 입력해주세요</Text>
 
             <TextInput
                 placeholder="예: 유지어터짱"
                 value={nickname}
                 onChangeText={setNickname}
-                style={{
-                    fontFamily: "Pretendard-Bold",
-                    borderWidth: 1,
-                    borderColor: "#6A4FB6",
-                    padding: 12,
-                    borderRadius: 8,
-                    marginBottom: 20,
-                    width: "100%",
-                }}
+                style={styles.input}
             />
 
             <TouchableOpacity onPress={handleNext}>
-                <Text
-                    style={{
-                        color: "#6A4FB6",
-                        fontSize: 16,
-                        fontFamily: "Pretendard-Bold",
-                        textAlign: "center",
-                    }}
-                >
-                    다음
-                </Text>
+                <Text style={styles.buttonText}>다음</Text>
             </TouchableOpacity>
         </View>
     );
 }
+
+const styles = StyleSheet.create({
+    container: {
+        width: "100%",
+        paddingHorizontal: 24,
+    },
+    title: {
+        fontSize: 20,
+        marginBottom: 12,
+        fontFamily: "Pretendard-Bold",
+        textAlign: "center",
+        color: Colors.light.text, // 기본 텍스트 색상
+    },
+    input: {
+        fontFamily: "Pretendard-Bold",
+        borderWidth: 1,
+        borderColor: Colors.light.tint, // 테두리 색상
+        padding: 12,
+        borderRadius: 8,
+        marginBottom: 20,
+        width: "100%",
+    },
+    buttonText: {
+        color: Colors.light.tint, // 버튼 텍스트 색상
+        fontSize: 16,
+        fontFamily: "Pretendard-Bold",
+        textAlign: "center",
+    },
+});
