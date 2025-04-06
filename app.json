@@ -20,7 +20,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.elanvital3.yoojieter"
     },
     "web": {
       "bundler": "metro",
@@ -53,6 +54,14 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "8ad399dc-bfd0-4703-8a20-dc99c6a5f5ad"
+      }
     }
   }
 }

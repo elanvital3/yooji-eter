@@ -8,6 +8,9 @@ import { onAuthStateChanged } from "firebase/auth";
 import { useRouter } from "expo-router";
 import CustomText from "../../components/CustomText";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons"; // react-native-vector-icons 설치 필요
+import { AntDesign } from '@expo/vector-icons';
+import { FaBook } from 'react-icons/fa';
+
 
 type Journal = {
     id: string;
@@ -81,7 +84,10 @@ export default function HomeScreen() {
                         } as any);
                     }}
                 >
-                    <Icon name="book-open" size={30} color="#6A4FB6" style={styles.icon} />
+                    {/* <Icon name="book-open" size={30} color="#6A4FB6" style={styles.icon} /> */}
+
+                    <AntDesign name="book" size={30} color="#6A4FB6" style={styles.icon} />
+
                     <View style={styles.journalInfo}>
                         <Text style={styles.journalType}>{journal.type}</Text>
                         <Text style={styles.dDay}>D-Day {calculateDays(journal.startedAt)}</Text>
@@ -144,7 +150,8 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     icon: {
-        marginRight: 15,
+        marginRight: 10,
+        marginTop: 5,
     },
     journalInfo: {
         justifyContent: "center",
