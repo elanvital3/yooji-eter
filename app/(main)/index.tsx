@@ -9,7 +9,7 @@ import { useRouter } from "expo-router";
 import CustomText from "../../components/CustomText";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons"; // react-native-vector-icons 설치 필요
 import { AntDesign } from '@expo/vector-icons';
-import { FaBook } from 'react-icons/fa';
+// import { FaBook } from 'react-icons/fa';
 
 
 type Journal = {
