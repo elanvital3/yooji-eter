@@ -1,11 +1,11 @@
 // 📁 app/(auth)/_layout.tsx
 import { Slot } from "expo-router";
-import { Image, View, StyleSheet } from "react-native";
-import { Colors } from "../../constants/Colors"
+import { Image, View } from "react-native";
+import { styles } from "../../constants/authStyles";  // 공통 스타일 임포트
 
 export default function AuthLayout() {
     return (
-        <View style={styles.container}>
+        <View style={styles.mainContainer}>
             {/* 🐰 공통 캐릭터 */}
             <Image
                 source={require("../../assets/images/mainCharacter.png")}
@@ -14,22 +14,7 @@ export default function AuthLayout() {
 
             {/* 👇 아래쪽 페이지 내용 */}
             <Slot />
+
         </View>
     );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: Colors.light.background,
-        alignItems: "center",
-        paddingHorizontal: 24,
-        paddingTop: 100, // 위에 공간 줘서 캐릭터 띄우기
-    },
-    character: {
-        width: 180,
-        height: 180,
-        resizeMode: "contain",
-        marginBottom: 24,
-    },
-});

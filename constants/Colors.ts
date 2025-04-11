@@ -28,32 +28,32 @@ export const Colors = {
  */
 
 
-// constants/Colors.ts (기존 코드와 병합)
-const tintColorLight = '#6A4FB6';
-// const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
-
 export const Colors = {
   light: {
-    text: '#11181C',
-    background: '#fff',
-    tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
-    lightPurple: "#F7F3FF",  // 연한 보라색
-    darkPurple: "#6A4FB6",   // 진한 보라색
-    darkGray: "#595959",     // 진한 회색 (기본 글씨색)
+    background: "#FFF",  // 배경색
+    primary: "#6750A4",
+    text: "#625B71",         // 기본 텍스트 색상
+    lightGray: "#FEF7FF",
+    // text: "#322F35",         // 기본 텍스트 색상
+    // light: "#EADDFF",
+    gray: "#B0B0B0",
+    secondary: "#625B71",
+    info: "#E6E0E9",
+    error: "#FFD8E4",
+    // gray: "#777",
+    subColor: "#F7F3FF",
+    tint: "#6A4FB6",         // 보라색
+    icon: "#687076",         // 아이콘 색상
+    tabIconDefault: "#687076",
+    tabIconSelected: "#6A4FB6",
+    journalType: "#6A4FB6",  // journalType 색상
   },
   dark: {
-    text: '#ECEDEE',
-    background: '#151718',
-    tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
-    lightPurple: "#F7F3FF",  // 연한 보라색
-    darkPurple: "#6A4FB6",   // 진한 보라색
-    darkGray: "#595959",     // 진한 회색 (기본 글씨색)
+    text: "#ECEDEE",
+    background: "#151718",
+    tint: "#fff",
+    icon: "#9BA1A6",
+    tabIconDefault: "#9BA1A6",
+    tabIconSelected: "#fff",
   },
 };

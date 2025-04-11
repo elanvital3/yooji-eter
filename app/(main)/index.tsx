@@ -1,159 +1,190 @@
+// 📁 app/(main)/journalDetail.tsx
 import { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from "react-native";
-import { collection, query, where, getDocs } from "firebase/firestore";
-import { db, auth } from "../../firebase/config";
-import { onAuthStateChanged } from "firebase/auth";
-import { useRouter } from "expo-router";
-import CustomText from "../../components/CustomText";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons"; // react-native-vector-icons 설치 필요
-import { AntDesign } from '@expo/vector-icons';
+import {
+    View,
+    Text,
+    TouchableOpacity,
+    StyleSheet,
+    ActivityIndicator,
+    Alert,
+} from "react-native";
+import { useLocalSearchParams } from "expo-router";
+import { db } from "../../firebase/config";
+import {
+    doc,
+    getDoc,
+    setDoc,
+    collection,
+    getDocs,
+} from "firebase/firestore";
+import { Calendar, DateData } from "react-native-calendars";
 import { Colors } from "../../constants/Colors"; // Colors 임포트
+import { styles } from "../../constants/journalStyles"
 
-type Journal = {
-    id: string;
-    type: string;
-    startWeight: number;
-    startedAt: string;
+type ChecklistItem = {
+    title: string;
+    checked: boolean;
 };
 
-export default function HomeScreen() {
-    const [journal, setJournal] = useState<Journal | null>(null);
+export default function JournalDetailScreen() {
+    const { journalId } = useLocalSearchParams();
+    const [type, setType] = useState("");
+    const [startedAt, setStartedAt] = useState<Date | null>(null);
+    const [checklist, setChecklist] = useState<ChecklistItem[]>([]);
+    const [selectedDate, setSelectedDate] = useState(new Date());
     const [loading, setLoading] = useState(true);
-    const router = useRouter();
+    const [point, setPoint] = useState(0);
+
+    const dateKey = selectedDate.toISOString().slice(0, 10); // e.g. "2025-04-03"
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                const q = query(
-                    collection(db, "journals"),
-                    where("userId", "==", user.uid),
-                    where("status", "==", "in_progress")
+        const fetchData = async () => {
+            if (!journalId) return;
+
+            const journalRef = doc(db, "journals", journalId as string);
+            const journalSnap = await getDoc(journalRef);
+
+            if (!journalSnap.exists()) {
+                Alert.alert("오류", "유지일기 데이터를 찾을 수 없습니다.");
+                return;
+            }
+
+            const journalData = journalSnap.data();
+            setType(journalData.type);
+            setStartedAt(journalData.startedAt.toDate());
+
+            // 총 점수 계산
+            const logsSnapshot = await getDocs(collection(db, `journals/${journalId}/dailyLogs`));
+            let totalPoints = 0;
+            logsSnapshot.forEach((doc) => {
+                const items: ChecklistItem[] = doc.data().checklist || [];
+                const checkedCount = items.filter((item) => item.checked).length;
+                totalPoints += checkedCount;
+                // if (checkedCount === items.length && items.length > 0) {
+                //     totalPoints += 3; // 보너스
+                // }
+            });
+            setPoint(totalPoints);
+
+            const dailyLogRef = doc(db, `journals/${journalId}/dailyLogs/${dateKey}`);
+            const dailySnap = await getDoc(dailyLogRef);
+
+            if (dailySnap.exists()) {
+                setChecklist(dailySnap.data().checklist);
+            } else {
+                const baseChecklist: ChecklistItem[] = journalData.checklist.map(
+                    (item: ChecklistItem) => ({
+                        ...item,
+                        checked: false,
+                    })
                 );
-
-                const querySnapshot = await getDocs(q);
-
-                if (!querySnapshot.empty) {
-                    const doc = querySnapshot.docs[0];
-                    setJournal({
-                        id: doc.id,
-                        type: doc.data().type,
-                        startWeight: doc.data().startWeight,
-                        startedAt: doc.data().startedAt.toDate().toISOString(),
-                    });
-                }
+                setChecklist(baseChecklist);
             }
 
             setLoading(false);
-        });
+        };
 
-        return () => unsubscribe();
-    }, []);
+        fetchData();
+    }, [journalId, dateKey]);
 
-    if (loading) return <ActivityIndicator size="large" />;
+    const toggleItem = async (index: number) => {
+        const updated = [...checklist];
+        updated[index].checked = !updated[index].checked;
+        setChecklist(updated);
 
-    const calculateDays = (startDate: string) => {
-        const start = new Date(startDate);
-        const today = new Date();
-        const diffTime = today.getTime() - start.getTime();
-        return Math.floor(diffTime / (1000 * 3600 * 24));
+        try {
+            const ref = doc(db, `journals/${journalId}/dailyLogs/${dateKey}`);
+            await setDoc(ref, {
+                checklist: updated,
+                completedAt: new Date(),
+            });
+
+            const allChecked = updated.every((item) => item.checked);
+            if (allChecked) {
+                Alert.alert("👏 잘했어요!", `${dateKey}의 모든 항목을 완료했어요!`);
+            }
+        } catch (err) {
+            console.error("체크 저장 실패:", err);
+            Alert.alert("오류", "저장 중 문제가 발생했습니다.");
+        }
     };
 
+    if (loading || !startedAt) return <ActivityIndicator size="large" />;
+
+    const dayNumber =
+        Math.floor(
+            (selectedDate.getTime() - startedAt.getTime()) / (1000 * 60 * 60 * 24)
+        ) + 1;
+
     return (
-        <View style={styles.container}>
-            {/* 진행 중인 유지일기 정보 */}
-            {journal ? (
-                <TouchableOpacity
-                    style={styles.journalCard}
-                    onPress={() => {
-                        console.log("Navigating to journalDetail with ID:", journal.id);
-                        router.push({
-                            pathname: "/(main)/journalDetail",
-                            params: { journalId: journal.id },
-                        } as any);
-                    }}
-                >
-                    <AntDesign name="book" size={30} color={Colors.light.tint} style={styles.icon} />
+        <View style={styles.subContainer}>
+            {/* ✅ 상단 정보 */}
+            <View style={styles.infoRow}>
+                <Text style={styles.infoText}>📘 {type}</Text>
+                <Text style={styles.infoText}>Day {dayNumber}</Text>
+                <Text style={styles.infoText}>🔥 {point}pt</Text>
+            </View>
 
-                    <View style={styles.journalInfo}>
-                        <Text style={styles.journalType}>{journal.type}</Text>
-                        <Text style={styles.dDay}>D-Day {calculateDays(journal.startedAt)}</Text>
-                    </View>
-                </TouchableOpacity>
-            ) : (
-                <View>
-                    <Text
-                        style={styles.noJournalText}
+            {/* ✅ 달력 */}
+            <Calendar
+                current={selectedDate.toISOString().slice(0, 10)}
+                onDayPress={(day: DateData) => {
+                    const selected = new Date(day.dateString);
+                    setSelectedDate(selected);
+                }}
+                markedDates={{
+                    [selectedDate.toISOString().slice(0, 10)]: {
+                        selected: true,
+                        selectedColor: Colors.light.tint,
+                    },
+                }}
+                maxDate={new Date().toISOString().slice(0, 10)}
+                style={styles.calendar}
+                theme={{
+                    textDayFontSize: 14,
+                    textMonthFontSize: 14,
+                    textDayHeaderFontSize: 12,
+                    arrowColor: Colors.light.tint,
+                }}
+            />
+
+            {/* ✅ 체크리스트 */}
+            <View style={styles.list}>
+                {checklist.map((item, index) => (
+                    <TouchableOpacity
+                        key={index}
+                        style={styles.itemRow}
+                        onPress={() => toggleItem(index)}
                     >
-                        진행 중인 유지일기가 없습니다.
-                    </Text>
-                </View>
-            )}
-
-            <View>
-                <TouchableOpacity
-                    onPress={() => router.push("/(main)/selectDietType")}
-                    style={styles.startButton}
-                >
-                    <Text style={styles.startButtonText}>유지일기 시작하기</Text>
-                </TouchableOpacity>
+                        <Text style={[styles.itemText, item.checked && styles.checked]}>
+                            {item.checked ? "☑️" : "⬜"} {item.title}
+                        </Text>
+                    </TouchableOpacity>
+                ))}
             </View>
         </View>
     );
 }
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        padding: 24,
-        backgroundColor: Colors.light.background, // 배경색 연한 보라색
-    },
-    journalCard: {
-        flexDirection: "row",
-        backgroundColor: Colors.light.background, // 배경색 흰색
-        padding: 20,
-        borderRadius: 10,
-        width: "100%",
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.3,
-        shadowRadius: 4,
-        marginBottom: 20,
-    },
-    icon: {
-        marginRight: 10,
-        marginTop: 5,
-    },
-    journalInfo: {
-        justifyContent: "center",
-    },
-    journalType: {
-        fontSize: 18,
-        fontWeight: "bold",
-        color: Colors.light.tint, // 진한 보라색
-    },
-    dDay: {
-        fontSize: 16,
-        color: "#777",
-    },
-    noJournalText: {
-        fontSize: 18,
-        marginBottom: 12,
-        color: Colors.light.text, // 진한 회색
-        textAlign: "center",
-        fontFamily: "Pretendard-Bold",
-    },
-    startButton: {
-        backgroundColor: Colors.light.tint, // 버튼 배경색
-        paddingVertical: 12,
-        paddingHorizontal: 24,
-        borderRadius: 8,
-    },
-    startButtonText: {
-        color: "#fff",
-        fontSize: 16,
-        fontFamily: "Pretendard-Bold",
-        textAlign: "center",
-    },
-});
+// const styles = StyleSheet.create({
+//     container: { flex: 1, padding: 20, backgroundColor: Colors.light.background }, // 배경색 추가
+//     infoRow: {
+//         flexDirection: "row",
+//         justifyContent: "space-between",
+//         marginBottom: 12,
+//     },
+//     infoText: { fontSize: 16, fontWeight: "600", color: Colors.light.tint }, // 보라색 글씨
+//     calendar: {
+//         borderRadius: 8,
+//         elevation: 2,
+//         marginBottom: 10, // 간격 조정
+//     },
+//     list: { gap: 8 }, // 간격 좁힘
+//     itemRow: {
+//         paddingVertical: 6, // 간격 좁힘
+//         borderBottomWidth: 1,
+//         borderColor: "#eee",
+//     },
+//     itemText: { fontSize: 18, color: "#555" }, // 기본 텍스트 색상
+//     checked: { textDecorationLine: "line-through", color: "#999" },
+// });

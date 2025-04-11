@@ -8,9 +8,10 @@ export default function Index() {
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             if (user) {
-                router.replace("/(main)");
+                router.replace("/(journal)");
             } else {
                 router.replace("/(auth)");
+                // router.replace("/(test)");
             }
         });
 

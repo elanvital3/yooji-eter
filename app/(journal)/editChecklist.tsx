@@ -1,3 +1,5 @@
+// 📁 app/(main)/editChecklist.tsx
+
 import {
     View,
     Text,
@@ -5,13 +7,13 @@ import {
     Button,
     FlatList,
     TouchableOpacity,
-    StyleSheet,
     Alert,
 } from "react-native";
 import { useEffect, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { auth, db } from "../../firebase/config";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { styles } from "../../constants/journalStyles";  // 공통 스타일 임포트
 import { Colors } from "../../constants/Colors"; // Colors 임포트
 
 const CHECKLIST_PRESETS: Record<string, string[]> = {
@@ -101,7 +103,7 @@ export default function EditChecklistScreen() {
 
         try {
             await addDoc(collection(db, "journals"), data);
-            router.replace("/(main)");
+            router.replace("/(journal)");
         } catch (err) {
             console.error("Firestore 저장 오류:", err);
             Alert.alert("오류", "저장 중 문제가 발생했습니다.");
@@ -109,109 +111,60 @@ export default function EditChecklistScreen() {
     };
 
     return (
-        <View style={styles.container}>
+        <View style={styles.journalContainer}>
             <Text style={styles.title}>체크리스트를 수정해주세요</Text>
-
             <FlatList
                 data={checklist}
                 keyExtractor={(_, index) => index.toString()}
                 renderItem={({ item, index }) => (
-                    <View style={styles.itemRow}>
+                    <View style={styles.cardContainer}>
                         {editingIndex === index ? (
                             <View style={styles.editRow}>
                                 <TextInput
-                                    style={styles.input}
+                                    style={styles.editInput}
                                     value={editingText}
                                     onChangeText={setEditingText}
                                 />
-                                <TouchableOpacity onPress={handleSaveEdit}>
-                                    <Text style={styles.saveText}>저장</Text>
+                                <TouchableOpacity onPress={handleSaveEdit} style={styles.editSaveButton}>
+                                    <Text style={styles.editSaveText}>저장</Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity onPress={handleCancelEdit}>
-                                    <Text style={styles.cancelText}>취소</Text>
+                                <TouchableOpacity onPress={handleCancelEdit} style={styles.editCancelButton}>
+                                    <Text style={styles.editCancelText}>취소</Text>
                                 </TouchableOpacity>
                             </View>
                         ) : (
-                            <>
-                                <Text style={styles.itemText}>{item}</Text>
-                                <View style={{ flexDirection: "row", gap: 12 }}>
-                                    <TouchableOpacity onPress={() => handleStartEdit(index)}>
-                                        <Text style={styles.editText}>✏️</Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity onPress={() => handleRemove(index)}>
-                                        <Text style={styles.deleteText}>❌</Text>
-                                    </TouchableOpacity>
-                                </View>
-                            </>
+                            <View style={styles.checkCard}>
+                                {/* 텍스트를 클릭하면 수정 모드로 들어가도록 수정 */}
+                                <TouchableOpacity onPress={() => handleStartEdit(index)}>
+                                    <Text style={styles.checkCardText}>{item}</Text>
+                                </TouchableOpacity>
+                                {/* 삭제 아이콘을 카드 밖으로 배치 */}
+                                <TouchableOpacity onPress={() => handleRemove(index)} >
+                                    <Text style={styles.deleteText}>❌</Text>
+                                </TouchableOpacity>
+                            </View>
                         )}
+
                     </View>
                 )}
             />
-
             <View style={styles.addRow}>
                 <TextInput
                     value={newItem}
                     onChangeText={setNewItem}
-                    placeholder="새 항목 입력"
-                    style={styles.input}
+                    placeholder="추가하기"
+                    keyboardType="default"  // 기본 키보드 설정
+                    placeholderTextColor={Colors.light.primary}
+                    style={styles.newInput}
                 />
-                <Button title="추가" onPress={handleAdd} />
+                <TouchableOpacity onPress={handleAdd}>
+                    <Text style={styles.addCheckButton}>+</Text>
+                </TouchableOpacity>
             </View>
 
-            <Button title="유지일기 시작하기" onPress={handleCreate} />
+            <TouchableOpacity style={styles.startButton} onPress={handleCreate}>
+                <Text style={styles.startButtonText}>유지일기 시작하기</Text>
+            </TouchableOpacity>
         </View>
     );
 }
-
-const styles = StyleSheet.create({
-    container: { flex: 1, padding: 20, backgroundColor: Colors.light.background }, // 배경색
-    title: {
-        fontSize: 20,
-        marginBottom: 16,
-        fontFamily: "Pretendard-Bold",
-        textAlign: "center",
-        color: Colors.light.tint, // 보라색 텍스트
-    },
-    itemRow: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-        paddingVertical: 8,
-        borderBottomWidth: 1,
-        borderColor: Colors.light.tint, // 보라색 테두리
-        marginBottom: 12,
-    },
-    itemText: {
-        fontSize: 16,
-        fontFamily: "Pretendard-Bold",
-        color: Colors.light.tint, // 보라색 텍스트
-    },
-    editText: {
-        fontSize: 18,
-        fontFamily: "Pretendard-Bold",
-        color: Colors.light.tint,
-    },
-    deleteText: { fontSize: 18, color: "red" },
-    saveText: { color: "green", marginLeft: 8 },
-    cancelText: { color: "gray", marginLeft: 8 },
-    editRow: {
-        flex: 1,
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 8,
-    },
-    addRow: {
-        flexDirection: "row",
-        alignItems: "center",
-        marginTop: 20,
-        gap: 8,
-    },
-    input: {
-        flex: 1,
-        borderWidth: 1,
-        borderColor: Colors.light.tint, // 보라색 테두리
-        borderRadius: 8,
-        paddingHorizontal: 10,
-        paddingVertical: 8,
-    },
-});

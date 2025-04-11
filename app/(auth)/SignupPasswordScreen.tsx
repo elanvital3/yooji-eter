@@ -1,9 +1,8 @@
 // 📁 app/(auth)/signupPasswordScreen.tsx
-
-import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from "react-native";
+import React, { useState } from "react";
+import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
-import { useState } from "react";
-import { Colors } from "../../constants/Colors"; // Colors 임포트
+import { styles } from "../../constants/authStyles"; // 공통 스타일 임포트
 
 export default function SignupPasswordScreen() {
     const { email } = useLocalSearchParams();
@@ -28,7 +27,8 @@ export default function SignupPasswordScreen() {
     };
 
     return (
-        <View style={styles.container}>
+        // 📁 app/(auth)/signupPasswordScreen.tsx
+        <View style={styles.subContainer}>
             <Text style={styles.title}>회원가입: 비밀번호를 입력해주세요</Text>
 
             <TextInput
@@ -53,32 +53,3 @@ export default function SignupPasswordScreen() {
         </View>
     );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        width: "100%",
-        paddingHorizontal: 24,
-    },
-    title: {
-        fontSize: 20,
-        marginBottom: 12,
-        fontFamily: "Pretendard-Bold",
-        textAlign: "center",
-        color: Colors.light.text, // 기본 텍스트 색상
-    },
-    input: {
-        fontFamily: "Pretendard-Bold",
-        borderWidth: 1,
-        borderColor: Colors.light.tint, // 테두리 색상
-        padding: 12,
-        borderRadius: 8,
-        marginBottom: 10,
-        width: "100%",
-    },
-    buttonText: {
-        color: Colors.light.tint, // 버튼 텍스트 색상
-        fontSize: 16,
-        fontFamily: "Pretendard-Bold",
-        textAlign: "center",
-    },
-});

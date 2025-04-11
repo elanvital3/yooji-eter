@@ -1,12 +1,12 @@
 // 📁 app/(auth)/signupHeightScreen.tsx
 
-import { View, Text, TextInput, Alert, TouchableOpacity, StyleSheet } from "react-native";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { useState } from "react";
+import React, { useState } from "react";
+import { TextInput, TouchableOpacity, Text, View, Alert } from "react-native";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../firebase/config";
 import { getFirestore, setDoc, doc } from "firebase/firestore";
-import { Colors } from "../../constants/Colors"; // Colors 임포트
+import { styles } from "../../constants/authStyles";  // 공통 스타일 임포트
 
 const db = getFirestore();
 
@@ -43,7 +43,7 @@ export default function SignupHeightScreen() {
     };
 
     return (
-        <View style={styles.container}>
+        <View style={styles.subContainer}>
             <Text style={styles.title}>키를 입력해주세요 (cm)</Text>
 
             <TextInput
@@ -60,32 +60,3 @@ export default function SignupHeightScreen() {
         </View>
     );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        width: "100%",
-        paddingHorizontal: 24,
-    },
-    title: {
-        fontSize: 20,
-        marginBottom: 12,
-        fontFamily: "Pretendard-Bold",
-        textAlign: "center",
-        color: Colors.light.text, // 기본 텍스트 색상
-    },
-    input: {
-        fontFamily: "Pretendard-Bold",
-        borderWidth: 1,
-        borderColor: Colors.light.tint, // 테두리 색상
-        padding: 12,
-        borderRadius: 8,
-        marginBottom: 20,
-        width: "100%",
-    },
-    buttonText: {
-        color: Colors.light.tint, // 버튼 텍스트 색상
-        fontSize: 16,
-        fontFamily: "Pretendard-Bold",
-        textAlign: "center",
-    },
-});
