@@ -9,7 +9,7 @@ export const styles = StyleSheet.create({
         // backgroundColor: Colors.light.,
         justifyContent: "space-between",  // 캐릭터가 화면 상단에 오도록
         alignItems: "center",          // 수평 중앙 정렬
-        paddingHorizontal: 24,
+        paddingHorizontal: 12,
         marginTop: "10%"
         // paddingTop: "50%",                // 캐릭터 위쪽 공간을 늘려 캐릭터를 더 상단에 배치
     },

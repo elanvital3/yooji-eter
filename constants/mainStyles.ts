@@ -8,7 +8,7 @@ export const styles = StyleSheet.create({
         backgroundColor: Colors.light.background,
         justifyContent: "space-between",  // 캐릭터가 화면 상단에 오도록
         alignItems: "center",          // 수평 중앙 정렬
-        paddingHorizontal: 24,
+        paddingHorizontal: 12,
         // marginTop: "10%"
         // paddingTop: "50%",                // 캐릭터 위쪽 공간을 늘려 캐릭터를 더 상단에 배치
     },
@@ -58,7 +58,7 @@ export const styles = StyleSheet.create({
         // marginRight: 5,
     },
     menuText: {
-        fontSize: 22,
+        fontSize: 20,
         fontFamily: "Pretendard-Bold",
         color: Colors.light.text, // 점 3개 색상
     },
@@ -100,6 +100,7 @@ export const styles = StyleSheet.create({
         width: "100%",
         flexDirection: 'row',
         justifyContent: 'space-between',
+        alignItems: "center",
     },
     dateBox: {
         alignItems: 'center',
@@ -125,19 +126,13 @@ export const styles = StyleSheet.create({
         color: '#FFF',
         fontFamily: "Pretendard-Bold",
     },
+    dateArrow: {
+        fontSize: 16,
+        color: Colors.light.text,
+    },
 
     // ✅ main 화면
-    // infoRow: {
-    //     flexDirection: "row",
-    //     justifyContent: "space-between",
-    //     marginBottom: 12,
-    // },
-    // infoText: { fontSize: 16, fontWeight: "600", color: Colors.light.tint }, // 보라색 글씨
-    // calendar: {
-    //     borderRadius: 8,
-    //     elevation: 2,
-    //     marginBottom: 10, // 간격 조정
-    // },
+
     checkListContainer: { gap: 10, width: "100%", marginTop: 10, }, // 간격 좁힘
     itemRow: {
         elevation: 2, // 안드로이드 전용 그림자 깊이
@@ -154,7 +149,6 @@ export const styles = StyleSheet.create({
         color: Colors.light.text,
         fontFamily: "Pretendard-Bold",
     },
-    checked: { color: Colors.light.primary },
     radioOuter: {
         width: 24,
         height: 24,

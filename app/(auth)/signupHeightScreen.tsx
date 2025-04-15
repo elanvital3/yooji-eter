@@ -35,7 +35,7 @@ export default function SignupHeightScreen() {
                 createdAt: new Date(),
             });
 
-            router.replace("/(main)");
+            router.replace("/(journal)");
         } catch (err: any) {
             console.error("회원가입 에러:", err);
             Alert.alert("회원가입 실패", err.message);

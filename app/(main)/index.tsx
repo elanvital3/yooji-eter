@@ -42,6 +42,7 @@ export default function JournalDetailScreen() {
     const [point, setPoint] = useState(0);
     // const [weekDates, setWeekDates] = useState<string[]>([]);
     const [weekDates, setWeekDates] = useState<WeekDay[]>([]);
+    const [baseDate, setBaseDate] = useState(new Date());
 
     const dateKey = selectedDate.toISOString().slice(0, 10); // e.g. "2025-04-03"
 
@@ -108,8 +109,7 @@ export default function JournalDetailScreen() {
     // }, []);
 
     useEffect(() => {
-        const today = new Date();
-        const startOfWeekDate = startOfWeek(today, { weekStartsOn: 1 }); // 월요일 시작
+        const startOfWeekDate = startOfWeek(baseDate, { weekStartsOn: 1 });
 
         const weekData: WeekDay[] = Array.from({ length: 7 }).map((_, index) => {
             const dateObj = addDays(startOfWeekDate, index);
@@ -120,7 +120,7 @@ export default function JournalDetailScreen() {
         });
 
         setWeekDates(weekData);
-    }, []);
+    }, [baseDate]);
 
     const toggleItem = async (index: number) => {
         const updated = [...checklist];
@@ -192,18 +192,24 @@ export default function JournalDetailScreen() {
 
                 ))}
             </View> */}
+            {/* ✅ 상단 날짜 선택 */}
             <View style={styles.weekRow}>
+                {/* ◀ 왼쪽 주 이동 */}
+                <TouchableOpacity onPress={() => setBaseDate(prev => addDays(prev, -7))}>
+                    <Text style={styles.dateArrow}>◀</Text>
+                </TouchableOpacity>
+
+                {/* 날짜 7개 */}
                 {weekDates.map(({ date, day }, idx) => (
                     <TouchableOpacity
                         key={idx}
-                        // style={styles.dateBox}
                         style={[
                             styles.dateBox,
                             format(selectedDate, 'MM-dd') === date && styles.selectedDateBox
                         ]}
                         onPress={() => {
-                            const thisDate = new Date(`${new Date().getFullYear()}-${date}`);
-                            setSelectedDate(thisDate); // → 날짜 상태 변경
+                            const fullDate = new Date(`${baseDate.getFullYear()}-${date}`);
+                            setSelectedDate(fullDate);
                         }}
                     >
                         <Text
@@ -224,6 +230,11 @@ export default function JournalDetailScreen() {
                         </Text>
                     </TouchableOpacity>
                 ))}
+
+                {/* ▶ 오른쪽 주 이동 */}
+                <TouchableOpacity onPress={() => setBaseDate(prev => addDays(prev, 7))}>
+                    <Text style={styles.dateArrow}>▶</Text>
+                </TouchableOpacity>
             </View>
 
             {/* ✅ 체크리스트 */}
