@@ -3,7 +3,7 @@
 import { Slot } from "expo-router";
 import { Image, View, TouchableOpacity, Text, Alert } from "react-native";
 import { useLocalSearchParams } from "expo-router";
-import { styles } from "../../constants/checkStyles";  // 공통 스타일 임포트
+import { styles } from "../../constants/mainStyles";  // 공통 스타일 임포트
 import { signOut } from "firebase/auth";
 import { auth } from "../../firebase/config";
 import { useRouter } from "expo-router";
@@ -123,7 +123,8 @@ export default function MainLayout() {
         <View style={styles.mainContainer}>
             {/* 상단 배치 */}
             <View style={styles.topContainer}>
-                <Text style={styles.topDate}>{currentDate}</Text>
+                <Text style={styles.topDate}>{nickname}</Text>
+                {/* <Text style={styles.topDate}>{currentDate}</Text> */}
                 <Text style={styles.topDday}>{journalType} ({dayNumber} days) </Text>
                 <View style={styles.topPoint}>
                     <Text style={styles.pointText}>🔥 {point} pt</Text>

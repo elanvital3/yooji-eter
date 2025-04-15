@@ -1,4 +1,4 @@
-// 📁 app/(main)/journalDetail.tsx
+// 📁 app/(main)/.tsx
 import { useEffect, useState } from "react";
 import {
     View,
@@ -19,11 +19,17 @@ import {
 } from "firebase/firestore";
 import { Calendar, DateData } from "react-native-calendars";
 import { Colors } from "../../constants/Colors"; // Colors 임포트
-import { styles } from "../../constants/journalStyles"
+import { styles } from "../../constants/mainStyles"
+import { format, startOfWeek, addDays } from 'date-fns';
 
 type ChecklistItem = {
     title: string;
     checked: boolean;
+};
+
+type WeekDay = {
+    date: string; // 'MM-dd'
+    day: string;  // 'Mon', 'Tue', ...
 };
 
 export default function JournalDetailScreen() {
@@ -34,6 +40,8 @@ export default function JournalDetailScreen() {
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [loading, setLoading] = useState(true);
     const [point, setPoint] = useState(0);
+    // const [weekDates, setWeekDates] = useState<string[]>([]);
+    const [weekDates, setWeekDates] = useState<WeekDay[]>([]);
 
     const dateKey = selectedDate.toISOString().slice(0, 10); // e.g. "2025-04-03"
 
@@ -87,6 +95,33 @@ export default function JournalDetailScreen() {
         fetchData();
     }, [journalId, dateKey]);
 
+    // useEffect(() => {
+    //     const today = new Date(); // 오늘 날짜
+    //     const startOfWeekDate = startOfWeek(today, { weekStartsOn: 1 }); // 이번 주의 월요일 계산
+
+    //     // 이번 주의 월요일부터 일요일까지의 날짜를 계산
+    //     const dates = Array.from({ length: 7 }).map((_, index) => {
+    //         return format(addDays(startOfWeekDate, index), 'MM-dd'); // 각 날짜를 'yyyy-MM-dd' 형식으로
+    //     });
+
+    //     setWeekDates(dates); // 주간 날짜 설정
+    // }, []);
+
+    useEffect(() => {
+        const today = new Date();
+        const startOfWeekDate = startOfWeek(today, { weekStartsOn: 1 }); // 월요일 시작
+
+        const weekData: WeekDay[] = Array.from({ length: 7 }).map((_, index) => {
+            const dateObj = addDays(startOfWeekDate, index);
+            return {
+                date: format(dateObj, 'MM-dd'),
+                day: format(dateObj, 'EEE'), // Mon, Tue, ...
+            };
+        });
+
+        setWeekDates(weekData);
+    }, []);
+
     const toggleItem = async (index: number) => {
         const updated = [...checklist];
         updated[index].checked = !updated[index].checked;
@@ -117,16 +152,16 @@ export default function JournalDetailScreen() {
         ) + 1;
 
     return (
-        <View style={styles.subContainer}>
+        <>
             {/* ✅ 상단 정보 */}
-            <View style={styles.infoRow}>
+            {/* <View style={styles.infoRow}>
                 <Text style={styles.infoText}>📘 {type}</Text>
                 <Text style={styles.infoText}>Day {dayNumber}</Text>
                 <Text style={styles.infoText}>🔥 {point}pt</Text>
-            </View>
+            </View> */}
 
             {/* ✅ 달력 */}
-            <Calendar
+            {/* <Calendar
                 current={selectedDate.toISOString().slice(0, 10)}
                 onDayPress={(day: DateData) => {
                     const selected = new Date(day.dateString);
@@ -146,45 +181,71 @@ export default function JournalDetailScreen() {
                     textDayHeaderFontSize: 12,
                     arrowColor: Colors.light.tint,
                 }}
-            />
+            /> */}
+            {/* ✅ 달력 */}
+            {/* <View style={styles.weekRow}>
+                {weekDates.map(({ date, day }, idx) => (
+                    <View key={idx} style={styles.dateBox}>
+                        <Text style={{ fontSize: 16 }}>{day}</Text>
+                        <Text style={{ fontSize: 14, color: 'gray' }}>{date}</Text>
+                    </View>
+
+                ))}
+            </View> */}
+            <View style={styles.weekRow}>
+                {weekDates.map(({ date, day }, idx) => (
+                    <TouchableOpacity
+                        key={idx}
+                        // style={styles.dateBox}
+                        style={[
+                            styles.dateBox,
+                            format(selectedDate, 'MM-dd') === date && styles.selectedDateBox
+                        ]}
+                        onPress={() => {
+                            const thisDate = new Date(`${new Date().getFullYear()}-${date}`);
+                            setSelectedDate(thisDate); // → 날짜 상태 변경
+                        }}
+                    >
+                        <Text
+                            style={[
+                                styles.dateText,
+                                format(selectedDate, 'MM-dd') === date && styles.selectedDateText
+                            ]}
+                        >
+                            {day}
+                        </Text>
+                        <Text
+                            style={[
+                                styles.dateSubText,
+                                format(selectedDate, 'MM-dd') === date && styles.selectedDateText
+                            ]}
+                        >
+                            {date}
+                        </Text>
+                    </TouchableOpacity>
+                ))}
+            </View>
 
             {/* ✅ 체크리스트 */}
-            <View style={styles.list}>
+            <View style={styles.checkListContainer}>
                 {checklist.map((item, index) => (
                     <TouchableOpacity
                         key={index}
                         style={styles.itemRow}
                         onPress={() => toggleItem(index)}
                     >
-                        <Text style={[styles.itemText, item.checked && styles.checked]}>
-                            {item.checked ? "☑️" : "⬜"} {item.title}
+                        <Text style={[styles.itemText]}>
+                            {item.title}
                         </Text>
+                        {/* <Text style={[styles.itemText, item.checked && styles.checked]}>
+                            {item.checked ? "✅" : "⬜"}
+                        </Text> */}
+                        <View style={styles.radioOuter}>
+                            {item.checked && <View style={styles.radioInner} />}
+                        </View>
                     </TouchableOpacity>
                 ))}
             </View>
-        </View>
+        </>
     );
 }
-
-// const styles = StyleSheet.create({
-//     container: { flex: 1, padding: 20, backgroundColor: Colors.light.background }, // 배경색 추가
-//     infoRow: {
-//         flexDirection: "row",
-//         justifyContent: "space-between",
-//         marginBottom: 12,
-//     },
-//     infoText: { fontSize: 16, fontWeight: "600", color: Colors.light.tint }, // 보라색 글씨
-//     calendar: {
-//         borderRadius: 8,
-//         elevation: 2,
-//         marginBottom: 10, // 간격 조정
-//     },
-//     list: { gap: 8 }, // 간격 좁힘
-//     itemRow: {
-//         paddingVertical: 6, // 간격 좁힘
-//         borderBottomWidth: 1,
-//         borderColor: "#eee",
-//     },
-//     itemText: { fontSize: 18, color: "#555" }, // 기본 텍스트 색상
-//     checked: { textDecorationLine: "line-through", color: "#999" },
-// });

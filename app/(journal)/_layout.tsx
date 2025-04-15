@@ -2,7 +2,7 @@
 
 import { Slot } from "expo-router";
 import { Image, View, TouchableOpacity, Text } from "react-native";
-import { styles } from "../../constants/mainStyles";  // 공통 스타일 임포트
+import { styles } from "../../constants/journalStyles";  // 공통 스타일 임포트
 import { signOut } from "firebase/auth";
 import { auth } from "../../firebase/config";
 import { useRouter } from "expo-router";

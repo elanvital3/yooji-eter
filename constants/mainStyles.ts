@@ -5,11 +5,11 @@ import { Colors } from "./Colors";
 export const styles = StyleSheet.create({
     mainContainer: {
         flex: 1,
-        // backgroundColor: Colors.light.,
+        backgroundColor: Colors.light.background,
         justifyContent: "space-between",  // 캐릭터가 화면 상단에 오도록
         alignItems: "center",          // 수평 중앙 정렬
         paddingHorizontal: 24,
-        marginTop: "10%"
+        // marginTop: "10%"
         // paddingTop: "50%",                // 캐릭터 위쪽 공간을 늘려 캐릭터를 더 상단에 배치
     },
     topContainer: {
@@ -17,10 +17,32 @@ export const styles = StyleSheet.create({
         width: "100%",
         justifyContent: "space-between", // 왼쪽과 오른쪽에 간격을 둠
         alignItems: "center", // 세로 중앙 정렬
+        // backgroundColor: Colors.light.primary,
         // paddingHorizontal: 24, // 양 옆에 여백을 둠
         // paddingTop: 10, // 상단 여백
     },
+    subContainer: {
+        flex: 1,
+        backgroundColor: Colors.light.background,
+        alignItems: "center",          // 수평 중앙 정렬
+        marginTop: 10,
+        width: "100%",
+    },
+    bottomContainer: {
+        // flex: 1,
+        backgroundColor: Colors.light.info,
+        width: "100%",
+        height: 30,
+        alignItems: "center",          // 수평 중앙 정렬
+    },
+
+    // ✅ 상단메뉴
     topDate: {
+        fontSize: 16,
+        fontFamily: "Pretendard-Bold",
+        color: Colors.light.text, // 기본 텍스트 색상
+    },
+    topDday: {
         fontSize: 16,
         fontFamily: "Pretendard-Bold",
         color: Colors.light.text, // 기본 텍스트 색상
@@ -70,20 +92,87 @@ export const styles = StyleSheet.create({
         fontFamily: "Pretendard",
         color: Colors.light.primary, // 점 3개 색상
     },
-    subContainer: {
-        flex: 1,
-        backgroundColor: Colors.light.background,
-        alignItems: "center",          // 수평 중앙 정렬
-        marginTop: 10,
+
+
+
+    // ✅ main 달력    
+    weekRow: {
         width: "100%",
+        flexDirection: 'row',
+        justifyContent: 'space-between',
     },
-    bottomContainer: {
-        // flex: 1,
-        // backgroundColor: Colors.light.info,
-        width: "100%",
-        height: 30,
-        alignItems: "center",          // 수평 중앙 정렬
+    dateBox: {
+        alignItems: 'center',
+        borderRadius: 12,
+        backgroundColor: Colors.light.lightGray,
+        paddingHorizontal: 5,
     },
+
+    selectedDateBox: {
+        backgroundColor: Colors.light.primary,
+        color: "#FFFFFF"
+    },
+    dateText: {
+        fontSize: 14,
+        fontFamily: "Pretendard",
+    },
+    dateSubText: {
+        fontSize: 14,
+        fontFamily: "Pretendard",
+    },
+
+    selectedDateText: {
+        color: '#FFF',
+        fontFamily: "Pretendard-Bold",
+    },
+
+    // ✅ main 화면
+    // infoRow: {
+    //     flexDirection: "row",
+    //     justifyContent: "space-between",
+    //     marginBottom: 12,
+    // },
+    // infoText: { fontSize: 16, fontWeight: "600", color: Colors.light.tint }, // 보라색 글씨
+    // calendar: {
+    //     borderRadius: 8,
+    //     elevation: 2,
+    //     marginBottom: 10, // 간격 조정
+    // },
+    checkListContainer: { gap: 10, width: "100%", marginTop: 10, }, // 간격 좁힘
+    itemRow: {
+        elevation: 2, // 안드로이드 전용 그림자 깊이
+        backgroundColor: '#fff', // elevation은 배경색이 있어야 보임
+        borderRadius: 10, // 모서리 둥글게 (선택)
+        justifyContent: "space-between",
+        flexDirection: "row",
+        padding: 10, // 간격 좁힘
+        borderBottomWidth: 1,
+        borderColor: "#eee",
+    },
+    itemText: {
+        fontSize: 18,
+        color: Colors.light.text,
+        fontFamily: "Pretendard-Bold",
+    },
+    checked: { color: Colors.light.primary },
+    radioOuter: {
+        width: 24,
+        height: 24,
+        borderRadius: 12, // 완전한 원
+        borderWidth: 2,
+        borderColor: Colors.light.primary,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 10,
+    },
+
+    radioInner: {
+        width: 12,
+        height: 12,
+        borderRadius: 6,
+        backgroundColor: Colors.light.primary,
+    },
+
 
 
 
