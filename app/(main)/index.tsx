@@ -32,17 +32,25 @@ type WeekDay = {
     day: string;  // 'Mon', 'Tue', ...
 };
 
+
 export default function JournalDetailScreen() {
-    const { journalId } = useLocalSearchParams();
+    const { journalId, dateKey: paramDateKey } = useLocalSearchParams();
+
+    const initialDate = paramDateKey
+        ? new Date(paramDateKey as string)
+        : new Date();
+
+    const [selectedDate, setSelectedDate] = useState(initialDate);
+    const [baseDate, setBaseDate] = useState(
+        startOfWeek(initialDate, { weekStartsOn: 1 })
+    );
     const [type, setType] = useState("");
     const [startedAt, setStartedAt] = useState<Date | null>(null);
     const [checklist, setChecklist] = useState<ChecklistItem[]>([]);
-    const [selectedDate, setSelectedDate] = useState(new Date());
     const [loading, setLoading] = useState(true);
     const [point, setPoint] = useState(0);
     // const [weekDates, setWeekDates] = useState<string[]>([]);
     const [weekDates, setWeekDates] = useState<WeekDay[]>([]);
-    const [baseDate, setBaseDate] = useState(new Date());
 
     const dateKey = selectedDate.toISOString().slice(0, 10); // e.g. "2025-04-03"
 

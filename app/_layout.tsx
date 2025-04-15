@@ -7,8 +7,10 @@ import * as Notifications from "expo-notifications";
 import { usePushToken } from "../hooks/usePushNotifications";
 import { useCurrentUser } from "../hooks/useCurrentUser";
 import { useCurrentJournalId } from "../hooks/useCurrentJournalId";
+import { useDailyPushNotification } from "../hooks/useDailyPushNotification";
 import { doc, setDoc, query, where, getDocs, collection } from "firebase/firestore";
 import { auth, db } from "../firebase/config";
+import { useRouter } from "expo-router";
 
 // ✅ 앱이 foreground(열려 있을 때)에도 알림 UI 띄우도록 설정
 Notifications.setNotificationHandler({
@@ -30,6 +32,10 @@ export default function RootLayout() {
   const token = usePushToken();
   const user = useCurrentUser(); // 👉 uid 확인 가능
   const journalId = useCurrentJournalId(); // 👉 자동 연동된 유지일기 ID
+  const router = useRouter();  // ✅ 추가
+
+  // ✅ 앱이 켜지고 로그인되어 있다면 알림 예약
+  useDailyPushNotification(!!user); // ← 핵심 한 줄!
 
   // ✅ 폰트 로딩 완료되면 스플래시 숨기기
   useEffect(() => {
@@ -56,7 +62,6 @@ export default function RootLayout() {
         if (!uid || !dateKey) return;
 
         try {
-          // ✅ 1. 활성화된 유지일기 불러오기
           const q = query(
             collection(db, "journals"),
             where("userId", "==", uid),
@@ -65,26 +70,29 @@ export default function RootLayout() {
           const snapshot = await getDocs(q);
           if (snapshot.empty) return;
 
-          const journalDoc = snapshot.docs[0];
-          const journalId = journalDoc.id;
+          // const journalDoc = snapshot.docs[0];
+          // const journalId = journalDoc.id;
 
-          // ✅ 2. checklist 템플릿 불러오기
-          const checklist = journalDoc.data().checklist || [];
+          // const checklist = journalDoc.data().checklist || [];
 
-          // ✅ 3. 모든 항목을 checked: true로 바꾸기
-          const completedChecklist = checklist.map((item: any) => ({
-            title: item.title,
-            checked: true,
-          }));
+          // const completedChecklist = checklist.map((item: any) => ({
+          //   title: item.title,
+          //   checked: true,
+          // }));
 
-          // ✅ 4. 해당 날짜에 저장
-          const ref = doc(db, `journals/${journalId}/dailyLogs/${dateKey}`);
-          await setDoc(ref, {
-            checklist: completedChecklist,
-            completedAt: new Date(),
+          // const ref = doc(db, `journals/${journalId}/dailyLogs/${dateKey}`);
+          // await setDoc(ref, {
+          //   checklist: completedChecklist,
+          //   completedAt: new Date(),
+          // });
+
+          // console.log(`✅ 알림 클릭 → ${dateKey} 체크리스트 자동 완료됨`);
+
+          // ✅ 알림 클릭 후 오늘 화면으로 이동
+          router.push({
+            pathname: "/(main)",
+            params: { journalId, dateKey },
           });
-
-          console.log(`✅ 알림 클릭 → ${dateKey} 체크리스트 자동 완료됨`);
         } catch (err) {
           console.error("❌ 알림 처리 중 오류:", err);
         }
