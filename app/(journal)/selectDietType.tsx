@@ -1,4 +1,4 @@
-// 📁 app/(main)/selectDietType.tsx
+// 📁 app/(journal)/selectDietType.tsx
 import { View, Text, TouchableOpacity, Button } from "react-native";
 import { useState } from "react";
 import { useRouter } from "expo-router";

@@ -1,4 +1,4 @@
-// 📁 app/(main)/_layout.tsx
+// 📁 app/(journal)/_layout.tsx
 
 import { Slot } from "expo-router";
 import { Image, View, TouchableOpacity, Text } from "react-native";

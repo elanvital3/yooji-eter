@@ -1,4 +1,4 @@
-// 📁 app/(main)/editChecklist.tsx
+// 📁 app/(journal)/editChecklist.tsx
 
 import {
     View,
@@ -12,7 +12,7 @@ import {
 import { useEffect, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { auth, db } from "../../firebase/config";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, where, query, getDocs } from "firebase/firestore";
 import { styles } from "../../constants/journalStyles";  // 공통 스타일 임포트
 import { Colors } from "../../constants/Colors"; // Colors 임포트
 
@@ -92,16 +92,27 @@ export default function EditChecklistScreen() {
             return;
         }
 
-        const data = {
-            userId: user.uid,
-            type,
-            startWeight: parseFloat(startWeight as string),
-            startedAt: serverTimestamp(),
-            status: "in_progress",
-            checklist: checklist.map((title) => ({ title, checked: false })),
-        };
-
         try {
+            // ✅ 기존 활성화된 저널이 있는지 확인
+            const q = query(
+                collection(db, "journals"),
+                where("userId", "==", user.uid),
+                where("status", "==", "in_progress")
+            );
+            const snapshot = await getDocs(q);
+            const alreadyActive = !snapshot.empty;
+
+            // ✅ 새로 만들 저널 데이터 구성
+            const data = {
+                userId: user.uid,
+                type,
+                startWeight: parseFloat(startWeight as string),
+                startedAt: serverTimestamp(),
+                status: alreadyActive ? "inactive" : "in_progress",
+                checklist: checklist.map((title) => ({ title, checked: false })),
+            };
+
+            // ✅ Firestore에 저장
             await addDoc(collection(db, "journals"), data);
             router.replace("/(journal)");
         } catch (err) {

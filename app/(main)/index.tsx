@@ -1,4 +1,4 @@
-// 📁 app/(main)/.tsx
+// 📁 app/(main)/index.tsx
 import { useEffect, useState } from "react";
 import {
     View,

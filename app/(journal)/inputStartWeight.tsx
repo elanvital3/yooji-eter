@@ -1,4 +1,4 @@
-// 📁 app/(main)/inputStartWeight.tsx
+// 📁 app/(journal)/inputStartWeight.tsx
 import { View, Text, TextInput, Button, TouchableOpacity, Alert } from "react-native";
 import { useState } from "react";
 import { useRouter, useLocalSearchParams } from "expo-router";
