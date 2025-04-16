@@ -31,7 +31,7 @@ export default function SelectDietTypeScreen() {
                 <TouchableOpacity
                     key={option.key}
                     style={[
-                        styles.card,
+                        styles.journalCard,
                         selected === option.key && styles.selectedCard,
                     ]}
                     onPress={() => setSelected(option.key)}

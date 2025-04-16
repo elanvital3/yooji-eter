@@ -1,6 +1,6 @@
 // 📁 app/(journal)/index.tsx
 import { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, ActivityIndicator, FlatList } from "react-native";
+import { View, Switch, Text, TouchableOpacity, ActivityIndicator, FlatList } from "react-native";
 import { useRouter } from "expo-router";
 import { styles } from "../../constants/journalStyles";  // 공통 스타일 임포트
 import { collection, query, where, getDocs, updateDoc, deleteDoc, doc } from "firebase/firestore";
@@ -8,6 +8,9 @@ import { db, auth } from "../../firebase/config";
 import { onAuthStateChanged } from "firebase/auth";
 import { AntDesign } from '@expo/vector-icons';
 import { Colors } from "../../constants/Colors"; // Colors 임포트
+import { format } from 'date-fns';
+import { MaterialIcons, Ionicons } from '@expo/vector-icons'; // 휴지통 아이콘용
+
 type Journal = {
     id: string;
     type: string;
@@ -104,10 +107,10 @@ export default function HomeScreen() {
     };
 
     const calculateDays = (startDate: string) => {
-        const start = new Date(startDate);
-        const today = new Date();
-        const diffTime = today.getTime() - start.getTime();
-        return Math.floor(diffTime / (1000 * 3600 * 24));
+        const start = new Date(new Date(startDate).getTime() + 9 * 60 * 60 * 1000); // KST로 보정
+        const now = new Date(new Date().getTime() + 9 * 60 * 60 * 1000); // 현재 시간도 KST로 보정
+        const diffTime = now.getTime() - start.getTime();
+        return Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1; // ✅ Day 1부터 시작
     };
 
     return (
@@ -123,7 +126,7 @@ export default function HomeScreen() {
                         <View
                             style={[
                                 styles.journalCard,
-                                item.status === "in_progress" && { backgroundColor: "#E0F7FA" } // ✅ 강조 배경
+                                item.status === "in_progress" && { backgroundColor: Colors.light.lightGray } // ✅ 강조 배경
                             ]}
                         >
                             <TouchableOpacity
@@ -135,24 +138,33 @@ export default function HomeScreen() {
                                     });
                                 }}
                             >
-                                <AntDesign name="book" size={30} style={styles.icon} />
-                                <View >
-                                    <Text style={styles.journalType}>{item.type}</Text>
-                                    <Text style={styles.dDay}>+ {calculateDays(item.startedAt)} Day</Text>
+                                <View style={styles.journalRow}>
+                                    <AntDesign name="book" size={30} style={styles.bookIcon} />
+                                    <View>
+                                        <Text style={styles.journalType}>{item.type} ({calculateDays(item.startedAt)} Day)</Text>
+                                        <Text style={styles.startDate}>시작일 : {format(new Date(item.startedAt), 'yyyy-MM-dd')}</Text>
+                                    </View>
                                 </View>
                             </TouchableOpacity>
-                            {/* ✅ 버튼 3개 우측 정렬 */}
-                            <View style={{ gap: 4, justifyContent: 'center', marginLeft: 10 }}>
-                                <TouchableOpacity onPress={() => handleActivate(item.id)}>
-                                    <Text>활성화</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={() => handleDeactivate(item.id)}>
-                                    <Text>비활성화</Text>
-                                </TouchableOpacity>
+                            <View style={styles.controlRow}>
+                                <Switch
+                                    value={item.status === "in_progress"}
+                                    onValueChange={(val) => {
+                                        if (val) {
+                                            handleActivate(item.id);
+                                        } else {
+                                            handleDeactivate(item.id);
+                                        }
+                                    }}
+                                    trackColor={{ false: "#d3d3d3", true: Colors.light.primary }}
+                                    thumbColor="#ffffff"
+                                />
+
                                 <TouchableOpacity onPress={() => handleDelete(item.id)}>
-                                    <Text>삭제</Text>
+                                    <Ionicons name="trash-outline" size={20} style={styles.deleteIcon} />
                                 </TouchableOpacity>
                             </View>
+
                         </View>
 
                     )}

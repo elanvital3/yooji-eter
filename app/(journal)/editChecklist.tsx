@@ -15,6 +15,7 @@ import { auth, db } from "../../firebase/config";
 import { collection, addDoc, serverTimestamp, where, query, getDocs } from "firebase/firestore";
 import { styles } from "../../constants/journalStyles";  // 공통 스타일 임포트
 import { Colors } from "../../constants/Colors"; // Colors 임포트
+import { MaterialIcons, Ionicons } from '@expo/vector-icons'; // 휴지통 아이콘용
 
 const CHECKLIST_PRESETS: Record<string, string[]> = {
     switch_on: [
@@ -128,7 +129,7 @@ export default function EditChecklistScreen() {
                 data={checklist}
                 keyExtractor={(_, index) => index.toString()}
                 renderItem={({ item, index }) => (
-                    <View style={styles.cardContainer}>
+                    <View style={styles.checkListRow}>
                         {editingIndex === index ? (
                             <View style={styles.editRow}>
                                 <TextInput
@@ -151,7 +152,7 @@ export default function EditChecklistScreen() {
                                 </TouchableOpacity>
                                 {/* 삭제 아이콘을 카드 밖으로 배치 */}
                                 <TouchableOpacity onPress={() => handleRemove(index)} >
-                                    <Text style={styles.deleteText}>❌</Text>
+                                    <Ionicons name="trash-outline" size={20} style={styles.deleteIcon} />
                                 </TouchableOpacity>
                             </View>
                         )}

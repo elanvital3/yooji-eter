@@ -17,6 +17,7 @@ import {
     collection,
     getDocs,
 } from "firebase/firestore";
+import { MaterialIcons, Ionicons } from '@expo/vector-icons'; // 휴지통 아이콘용
 
 type ChecklistItem = {
     title: string;
@@ -181,6 +182,18 @@ export default function MainLayout() {
             </View>
 
             <View style={styles.bottomContainer}>
+                <TouchableOpacity style={styles.tabItem}>
+                    <Ionicons name="home-outline" size={24} color="#555" />
+                    <Text style={styles.tabLabel}>홈</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.tabItem}>
+                    <Ionicons name="book-outline" size={24} color="#555" />
+                    <Text style={styles.tabLabel}>기록</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.tabItem}>
+                    <Ionicons name="person-outline" size={24} color="#555" />
+                    <Text style={styles.tabLabel}>설정</Text>
+                </TouchableOpacity>
             </View>
         </View>
     );

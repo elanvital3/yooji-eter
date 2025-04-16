@@ -275,10 +275,14 @@ export default function JournalDetailScreen() {
                 {checklist.map((item, index) => (
                     <TouchableOpacity
                         key={index}
-                        style={styles.itemRow}
+                        style={[styles.itemRow, item.checked && {
+                            backgroundColor: "#EEE"
+                        }]}
                         onPress={() => toggleItem(index)}
                     >
-                        <Text style={[styles.itemText]}>
+                        <Text style={[styles.itemText, item.checked && {
+                            // textDecorationLine: 'line-through'
+                        }]}>
                             {item.title}
                         </Text>
                         {/* <Text style={[styles.itemText, item.checked && styles.checked]}>
@@ -289,7 +293,7 @@ export default function JournalDetailScreen() {
                         </View>
                     </TouchableOpacity>
                 ))}
-            </View>
+            </View >
         </>
     );
 }

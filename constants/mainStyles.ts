@@ -30,9 +30,16 @@ export const styles = StyleSheet.create({
     },
     bottomContainer: {
         // flex: 1,
-        backgroundColor: Colors.light.info,
-        width: "100%",
-        height: 30,
+        width: "105%",
+        bottom: 0,
+        borderColor: "#eee",
+        paddingVertical: 10,
+        borderWidth: 1,
+        elevation: 10, // 안드로이드 전용 그림자 깊이
+        backgroundColor: '#fff', // elevation은 배경색이 있어야 보임
+        borderRadius: 30, // 모서리 둥글게 (선택)
+        flexDirection: "row",
+        justifyContent: "space-evenly",
         alignItems: "center",          // 수평 중앙 정렬
     },
 
@@ -54,11 +61,16 @@ export const styles = StyleSheet.create({
     topPoint: {
         flexDirection: "row", // 가로로 배치
         alignItems: "center", // 세로 중앙 정렬
+        backgroundColor: Colors.light.lightGray,
+        paddingHorizontal: 5,
+        borderRadius: 10,
+
     },
     pointText: {
         fontSize: 16,
         fontFamily: "Pretendard-Bold",
         color: Colors.light.primary, // 포인트 색상
+
         // marginRight: 5,
     },
     menuText: {
@@ -190,7 +202,7 @@ export const styles = StyleSheet.create({
         color: '#FFF', // ✅ 바 위에 보이게 하얀 글자
     },
 
-    // ✅ main 화면
+    // ✅ check list 화면
 
     checkListContainer: { gap: 10, width: "100%", marginTop: 10, }, // 간격 좁힘
     itemRow: {
@@ -224,6 +236,18 @@ export const styles = StyleSheet.create({
         height: 12,
         borderRadius: 6,
         backgroundColor: Colors.light.primary,
+    },
+
+    tabItem: {
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+
+    tabLabel: {
+        fontSize: 12,
+        marginTop: 4,
+        color: '#555',
+        fontFamily: 'Pretendard',
     },
 
 

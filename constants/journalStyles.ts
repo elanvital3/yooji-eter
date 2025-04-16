@@ -1,9 +1,9 @@
-// 📁 constants/mainStyles.ts
+// 📁 constants/journalStyles.ts
 import { StyleSheet } from "react-native";
 import { Colors } from "./Colors";
 import { Platform } from 'react-native';
 export const styles = StyleSheet.create({
-    // 첫화면
+    // ✅ main 화면
     mainContainer: {
         flex: 1,
         // backgroundColor: Colors.light.,
@@ -77,39 +77,33 @@ export const styles = StyleSheet.create({
         height: 30,
         alignItems: "center",          // 수평 중앙 정렬
     },
-    // 일기 관련 스타일
+
+    // ✅ 일기 목록
     journalContainer: {
         width: "100%",
         flexGrow: 0,
     },
+    journalRow: {
+        flexDirection: "row",
+        alignItems: "center"
+    },
 
     journalCard: {
         flexDirection: "row",
-        backgroundColor: Colors.light.lightGray,  // 카드 배경 색상 수정
-        padding: 16,
-        borderRadius: 10,
+        elevation: 2, // 안드로이드 전용 그림자 깊이
+        backgroundColor: '#fff', // elevation은 배경색이 있어야 보임
+        borderRadius: 10, // 모서리 둥글게 (선택)
+        // backgroundColor: Colors.light.lightGray,  // 카드 배경 색상 수정
+        alignItems: "flex-start",
+        padding: 10,
         borderWidth: 1,
-        borderColor: Colors.light.gray,
-        marginBottom: 12, // 카드 간격 줄임
-        // overflow: 'hidden', // 이 부분을 추가해줍니다.
-        ...Platform.select({
-            ios: {
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.1,
-                shadowRadius: 3,
-            },
-            android: {
-                // elevation: 4,
-                // shadowColor: '#000',
-                // shadowOffset: { width: 0, height: 4 }, // 더 큰 그림자 효과
-                // shadowOpacity: 0.25, // 그림자 투명도
-                // shadowRadius: 4, // 그림자 크기
-            },
-            web: {
-                boxShadow: "0px 2px 3px rgba(0, 0, 0, 0.1)",  // 웹에서는 boxShadow 사용
-            },
-        }),
+        borderColor: "#eee",
+        marginBottom: 12, // 카드 간격 줄임     
+    },
+    bookIcon: {
+        marginRight: 5,
+        marginTop: 5,
+        color: Colors.light.primary
     },
     journalType: {
         fontSize: 16,
@@ -117,16 +111,33 @@ export const styles = StyleSheet.create({
         fontFamily: "Pretendard",
         color: Colors.light.primary,
     },
-    dDay: {
+    startDate: {
         fontSize: 14,
         color: Colors.light.gray, // 회색 D-Day
         // fontFamily: "Pretendard-Bold",
     },
-    icon: {
-        marginRight: 10,
-        marginTop: 5,
-        color: Colors.light.primary
+
+
+    // ✅ 토글관련
+    controlRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 5,
+        // marginLeft: 10,
     },
+    deleteIcon: {
+        color: Colors.light.text,
+    },
+
+    toggleLabel: {
+        fontSize: 10,
+        fontWeight: "bold",
+        color: Colors.light.text,
+        flex: 1,
+        textAlign: "center",
+    },
+
+    // 버튼 스타일
     title: {
         fontSize: 20,
         marginBottom: 12,
@@ -134,7 +145,6 @@ export const styles = StyleSheet.create({
         textAlign: "center",
         color: Colors.light.text, // 기본 텍스트 색상
     },
-    // 버튼 스타일
     startButton: {
         backgroundColor: Colors.light.primary, // 버튼 배경색
         paddingVertical: 12,
@@ -149,24 +159,6 @@ export const styles = StyleSheet.create({
         textAlign: "center",
     },
 
-    // 카드 스타일
-    card: {
-        padding: 16,
-        backgroundColor: Colors.light.subColor,
-        borderRadius: 8,
-        marginBottom: 6,
-        width: "100%",
-        alignItems: "center",
-        fontFamily: "Pretendard-Bold",
-        borderWidth: 1,
-        borderColor: Colors.light.primary, // 기본 테두리 색상
-    },
-    cardText: {
-        fontSize: 16,
-        fontFamily: "Pretendard-Bold",
-        color: Colors.light.text, // 기본 텍스트 색상 (진한 회색)
-    },
-
     // 선택된 다이어트 카드 스타일
     selectedCard: {
         backgroundColor: Colors.light.primary, // 선택된 카드의 색상
@@ -177,9 +169,15 @@ export const styles = StyleSheet.create({
         color: "#fff", // 선택된 카드의 텍스트 색상 (흰색)
     },
 
+    // ✅ 다이어트 타입    
+    cardText: {
+        fontSize: 16,
+        fontFamily: "Pretendard-Bold",
+        color: Colors.light.text, // 기본 텍스트 색상 (진한 회색)
+    },
 
 
-    // 체중입력
+    // ✅ 체중입력
     buttonText: {
         color: Colors.light.primary, // 버튼 텍스트 색상
         fontSize: 16,
@@ -203,9 +201,8 @@ export const styles = StyleSheet.create({
     },
 
 
-
-    // 체크리스트 항목 스타일    
-    cardContainer: {
+    // ✅ 체크리스트 항목 스타일   
+    checkListRow: {
         width: "100%",
     },
     checkCard: {
@@ -224,10 +221,7 @@ export const styles = StyleSheet.create({
         fontFamily: "Pretendard-Bold",
         color: Colors.light.text, // 텍스트 색상
     },
-    deleteText: {
-        fontSize: 12,
-        color: "red",
-    },
+
 
 
     // 체크리스트 수정 
@@ -313,7 +307,7 @@ export const styles = StyleSheet.create({
     },
     addCheckButton: {
         fontSize: 30,
-        color: "green",
+        color: Colors.light.primary,
         fontFamily: "Pretendard-Bold",
     }
 });
