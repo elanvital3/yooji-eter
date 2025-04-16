@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "yooji-eter",
+    "name": "유지어터",
     "slug": "yooji-eter",
     "scheme": "yooji-eter",
     "platforms": [
@@ -8,9 +8,9 @@
       "android",
       "web"
     ],
-    "version": "1.0.3",
+    "version": "1.0.4",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/mainCharacter.png",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
