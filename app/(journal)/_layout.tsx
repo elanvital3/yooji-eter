@@ -14,7 +14,7 @@ import { format } from 'date-fns'; // 날짜 포맷을 위한 라이브러리
 export default function JournalLayout() {
     const [nickname, setNickname] = useState<string | null>(null);
     const [isMenuVisible, setIsMenuVisible] = useState(false);  // 메뉴 표시 상태
-    const [point, setPoint] = useState<number>(0);  // 포인트 상태
+    // const [point, setPoint] = useState<number>(0);  // 포인트 상태
     const router = useRouter();
     // console.log(isMenuVisible)
 
@@ -48,27 +48,52 @@ export default function JournalLayout() {
     return (
         <View style={styles.mainContainer}>
             {/* 상단 배치 */}
-            <View style={styles.topContainer}>
-                <Text style={styles.topDate}>{currentDate}</Text>
-                <View style={styles.topPoint}>
-                    <Text style={styles.pointText}>🔥 {point} pt</Text>
-                    <TouchableOpacity onPress={() => setIsMenuVisible(!isMenuVisible)}>
-                        <Text style={styles.menuText}> ⋮ </Text>
-                    </TouchableOpacity>
+            {/* <View style={styles.topContainer}> */}
+            <TouchableOpacity style={styles.topContainer} onPress={() => setIsMenuVisible(!isMenuVisible)}>
+                <Text style={styles.nickName}>{nickname}</Text>
+                <Text style={styles.menuText}> ⋮</Text>
+            </TouchableOpacity>
+            {isMenuVisible && (
+                <>
+                    {/* ✅ 화면 전체를 덮는 투명 오버레이 (빈 곳 터치 시 메뉴 닫힘) */}
+                    <TouchableOpacity
+                        style={{
+                            position: "absolute",
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            zIndex: 10,
+                        }}
+                        activeOpacity={1}
+                        onPress={() => setIsMenuVisible(false)}
+                    />
 
-                    {/* 메뉴 표시 */}
-                    {isMenuVisible && (
-                        <View style={styles.dropdownMenu}>
-                            <TouchableOpacity style={styles.topMenu1} onPress={handleLogout}>
-                                <Text style={styles.menuDetail}>로그아웃</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={styles.topMenu2} onPress={handleLogout}>
-                                <Text style={styles.menuDetail}>다른옵션</Text>
-                            </TouchableOpacity>
-                        </View>
-                    )}
-                </View>
-            </View >
+                    {/* ✅ 드롭다운 메뉴 */}
+                    <View style={[styles.dropdownMenu, { zIndex: 11 }]}>
+                        <TouchableOpacity
+                            style={styles.topMenu1}
+                            onPress={async () => {
+                                setIsMenuVisible(false);
+                                await handleLogout();
+                            }}
+                        >
+                            <Text style={styles.menuDetail}>로그아웃</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            style={styles.topMenu2}
+                            onPress={() => {
+                                setIsMenuVisible(false);
+                                console.log("📌 다른 옵션 선택됨");
+                            }}
+                        >
+                            <Text style={styles.menuDetail}>다른옵션</Text>
+                        </TouchableOpacity>
+                    </View>
+                </>
+            )}
+            {/* </View > */}
 
 
             {/* Slot: 남은 공간을 차지하도록 수정 */}

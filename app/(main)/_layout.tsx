@@ -123,27 +123,55 @@ export default function MainLayout() {
         <View style={styles.mainContainer}>
             {/* 상단 배치 */}
             <View style={styles.topContainer}>
-                <Text style={styles.topDate}>{nickname}</Text>
+                <TouchableOpacity style={styles.nickNameRow} onPress={() => setIsMenuVisible(!isMenuVisible)}>
+                    <Text style={styles.nickName}>{nickname}</Text>
+                    <Text style={styles.menuText}> ⋮ </Text>
+                </TouchableOpacity>
                 {/* <Text style={styles.topDate}>{currentDate}</Text> */}
                 <Text style={styles.topDday}>{journalType} ({dayNumber} days) </Text>
                 <View style={styles.topPoint}>
                     <Text style={styles.pointText}>🔥 {point} pt</Text>
-                    <TouchableOpacity onPress={() => setIsMenuVisible(!isMenuVisible)}>
-                        <Text style={styles.menuText}> ⋮ </Text>
-                    </TouchableOpacity>
+                </View>
+                {isMenuVisible && (
+                    <>
+                        {/* ✅ 화면 전체를 덮는 투명 오버레이 (빈 곳 터치 시 메뉴 닫힘) */}
+                        <TouchableOpacity
+                            style={{
+                                position: "absolute",
+                                top: 0,
+                                left: 0,
+                                right: 0,
+                                bottom: 0,
+                                zIndex: 10,
+                            }}
+                            activeOpacity={1}
+                            onPress={() => setIsMenuVisible(false)}
+                        />
 
-                    {/* 메뉴 표시 */}
-                    {isMenuVisible && (
-                        <View style={styles.dropdownMenu}>
-                            <TouchableOpacity style={styles.topMenu1} onPress={handleLogout}>
+                        {/* ✅ 드롭다운 메뉴 */}
+                        <View style={[styles.dropdownMenu, { zIndex: 11 }]}>
+                            <TouchableOpacity
+                                style={styles.topMenu1}
+                                onPress={async () => {
+                                    setIsMenuVisible(false);
+                                    await handleLogout();
+                                }}
+                            >
                                 <Text style={styles.menuDetail}>로그아웃</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity style={styles.topMenu2} onPress={handleLogout}>
+
+                            <TouchableOpacity
+                                style={styles.topMenu2}
+                                onPress={() => {
+                                    setIsMenuVisible(false);
+                                    console.log("📌 다른 옵션 선택됨");
+                                }}
+                            >
                                 <Text style={styles.menuDetail}>다른옵션</Text>
                             </TouchableOpacity>
                         </View>
-                    )}
-                </View>
+                    </>
+                )}
             </View >
 
 

@@ -9,7 +9,7 @@ export const styles = StyleSheet.create({
         justifyContent: "space-between",  // 캐릭터가 화면 상단에 오도록
         alignItems: "center",          // 수평 중앙 정렬
         paddingHorizontal: 12,
-        // marginTop: "10%"
+        marginTop: "10%"
         // paddingTop: "50%",                // 캐릭터 위쪽 공간을 늘려 캐릭터를 더 상단에 배치
     },
     topContainer: {
@@ -37,10 +37,14 @@ export const styles = StyleSheet.create({
     },
 
     // ✅ 상단메뉴
-    topDate: {
+    nickName: {
         fontSize: 16,
         fontFamily: "Pretendard-Bold",
         color: Colors.light.text, // 기본 텍스트 색상
+    },
+    nickNameRow: {
+        flexDirection: "row", // 가로로 배치
+        alignItems: "center", // 세로 중앙 정렬
     },
     topDday: {
         fontSize: 16,
@@ -65,11 +69,12 @@ export const styles = StyleSheet.create({
     dropdownMenu: {
         position: "absolute",
         top: 30, // 메뉴가 점 3개 아래로 펼쳐짐
-        right: 5,
+        left: 5,
         backgroundColor: Colors.light.background,
-        borderWidth: 1,
-        borderColor: Colors.light.primary, // 메뉴의 테두리 색상
-        borderRadius: 4,
+        elevation: 2, // 안드로이드 전용 그림자 깊이
+        // borderWidth: 1,
+        // borderColor: Colors.light.primary, // 메뉴의 테두리 색상
+        borderRadius: 8,
         padding: 5,
         width: "auto",
         zIndex: 100,
@@ -78,10 +83,10 @@ export const styles = StyleSheet.create({
     topMenu1: {
         paddingVertical: 4,
         paddingHorizontal: 4,
-        borderBottomWidth: 1,
-        backgroundColor: Colors.light.background,
+        // borderBottomWidth: 1,
+        // backgroundColor: Colors.light.background,
         zIndex: 100,
-        borderColor: Colors.light.primary, // 항목 사이의 구분선
+        // borderColor: Colors.light.primary, // 항목 사이의 구분선
     },
     topMenu2: {
         paddingVertical: 4,
@@ -99,14 +104,24 @@ export const styles = StyleSheet.create({
     weekRow: {
         width: "100%",
         flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: "center",
+        marginBottom: 10,
+    },
+    dayRow: {
+        width: "100%",
+        flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: "center",
     },
     dateBox: {
+        width: 50,
+        height: 40,
+        borderRadius: 10,
         alignItems: 'center',
-        borderRadius: 12,
+        justifyContent: 'center',
         backgroundColor: Colors.light.lightGray,
-        paddingHorizontal: 5,
+        position: 'relative', // ⭐️ 추가해줘야 위치 기준이 됨
     },
 
     selectedDateBox: {
@@ -121,6 +136,13 @@ export const styles = StyleSheet.create({
         fontSize: 14,
         fontFamily: "Pretendard",
     },
+    starBadge: {
+        position: 'absolute',
+        top: -10,      // 살짝 더 위로
+        right: -5,    // 박스 밖으로 조금 튀어나오게
+        fontSize: 14, // 또는 16
+        zIndex: 10,   // 다른 요소 위로 뜨게
+    },
 
     selectedDateText: {
         color: '#FFF',
@@ -129,6 +151,43 @@ export const styles = StyleSheet.create({
     dateArrow: {
         fontSize: 16,
         color: Colors.light.text,
+        paddingHorizontal: 10,
+    },
+
+    // ✅ 상태진행바
+    progressBarContainer: {
+        width: '100%',       // ✅ 추가
+        marginTop: 12,
+        alignItems: 'center',
+    },
+
+    progressBarBackground: {
+        width: '100%',
+        height: 24, // ✅ 기존보다 키움
+        backgroundColor: '#E0E0E0',
+        borderRadius: 10,
+        overflow: 'hidden',
+        justifyContent: 'center', // ✅ 텍스트 수직 가운데 정렬
+    },
+
+    progressBarFilled: {
+        height: '100%',
+        backgroundColor: Colors.light.primary,
+        position: 'absolute',
+        left: 0,
+        top: 0,
+        borderRadius: 10,
+    },
+
+    progressBarTextWrapper: {
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    progressBarText: {
+        fontSize: 14,
+        fontWeight: 'bold',
+        fontFamily: "Pretendard-Bold",
+        color: '#FFF', // ✅ 바 위에 보이게 하얀 글자
     },
 
     // ✅ main 화면

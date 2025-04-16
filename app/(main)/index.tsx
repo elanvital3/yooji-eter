@@ -21,6 +21,7 @@ import { Calendar, DateData } from "react-native-calendars";
 import { Colors } from "../../constants/Colors"; // Colors 임포트
 import { styles } from "../../constants/mainStyles"
 import { format, startOfWeek, addDays } from 'date-fns';
+import { ko } from 'date-fns/locale';
 
 type ChecklistItem = {
     title: string;
@@ -28,8 +29,9 @@ type ChecklistItem = {
 };
 
 type WeekDay = {
-    date: string; // 'MM-dd'
-    day: string;  // 'Mon', 'Tue', ...
+    date: string;   // 'dd'
+    day: string;    // '월', '화', ...
+    fullDate: Date; // 날짜 전체
 };
 
 
@@ -49,10 +51,15 @@ export default function JournalDetailScreen() {
     const [checklist, setChecklist] = useState<ChecklistItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [point, setPoint] = useState(0);
-    // const [weekDates, setWeekDates] = useState<string[]>([]);
     const [weekDates, setWeekDates] = useState<WeekDay[]>([]);
+    const [completedDays, setCompletedDays] = useState<Record<string, boolean>>({});
 
-    const dateKey = selectedDate.toISOString().slice(0, 10); // e.g. "2025-04-03"
+    const getKSTDateKey = (date: Date) => {
+        const tzOffset = date.getTime() + 9 * 60 * 60 * 1000; // UTC+9
+        return new Date(tzOffset).toISOString().slice(0, 10);
+    };
+
+    const dateKey = getKSTDateKey(selectedDate);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -88,6 +95,10 @@ export default function JournalDetailScreen() {
 
             if (dailySnap.exists()) {
                 setChecklist(dailySnap.data().checklist);
+
+                const allChecked = dailySnap.data().checklist.every((item: ChecklistItem) => item.checked);
+                const key = getKSTDateKey(selectedDate);
+                setCompletedDays(prev => ({ ...prev, [key]: allChecked }));
             } else {
                 const baseChecklist: ChecklistItem[] = journalData.checklist.map(
                     (item: ChecklistItem) => ({
@@ -104,17 +115,6 @@ export default function JournalDetailScreen() {
         fetchData();
     }, [journalId, dateKey]);
 
-    // useEffect(() => {
-    //     const today = new Date(); // 오늘 날짜
-    //     const startOfWeekDate = startOfWeek(today, { weekStartsOn: 1 }); // 이번 주의 월요일 계산
-
-    //     // 이번 주의 월요일부터 일요일까지의 날짜를 계산
-    //     const dates = Array.from({ length: 7 }).map((_, index) => {
-    //         return format(addDays(startOfWeekDate, index), 'MM-dd'); // 각 날짜를 'yyyy-MM-dd' 형식으로
-    //     });
-
-    //     setWeekDates(dates); // 주간 날짜 설정
-    // }, []);
 
     useEffect(() => {
         const startOfWeekDate = startOfWeek(baseDate, { weekStartsOn: 1 });
@@ -122,13 +122,44 @@ export default function JournalDetailScreen() {
         const weekData: WeekDay[] = Array.from({ length: 7 }).map((_, index) => {
             const dateObj = addDays(startOfWeekDate, index);
             return {
-                date: format(dateObj, 'MM-dd'),
-                day: format(dateObj, 'EEE'), // Mon, Tue, ...
+                date: format(dateObj, 'dd'),
+                day: format(dateObj, 'EEE', { locale: ko }),
+                fullDate: dateObj, // 🔥 전체 날짜 저장
             };
         });
 
         setWeekDates(weekData);
     }, [baseDate]);
+
+    useEffect(() => {
+        const fetchCompletedDays = async () => {
+            if (!journalId) return;
+
+            const startOfWeekDate = startOfWeek(baseDate, { weekStartsOn: 1 });
+
+            const newCompletedDays: Record<string, boolean> = {};
+
+            await Promise.all(
+                Array.from({ length: 7 }).map(async (_, index) => {
+                    const dateObj = addDays(startOfWeekDate, index);
+                    const key = getKSTDateKey(dateObj);
+                    const ref = doc(db, `journals/${journalId}/dailyLogs/${key}`);
+                    const snap = await getDoc(ref);
+
+                    if (snap.exists()) {
+                        const items: ChecklistItem[] = snap.data().checklist || [];
+                        newCompletedDays[key] = items.length > 0 && items.every((i) => i.checked);
+                    } else {
+                        newCompletedDays[key] = false;
+                    }
+                })
+            );
+
+            setCompletedDays(newCompletedDays);
+        };
+
+        fetchCompletedDays();
+    }, [baseDate, journalId]);
 
     const toggleItem = async (index: number) => {
         const updated = [...checklist];
@@ -143,6 +174,9 @@ export default function JournalDetailScreen() {
             });
 
             const allChecked = updated.every((item) => item.checked);
+            const key = getKSTDateKey(selectedDate);
+
+            setCompletedDays(prev => ({ ...prev, [key]: allChecked }));
             if (allChecked) {
                 Alert.alert("👏 잘했어요!", `${dateKey}의 모든 항목을 완료했어요!`);
             }
@@ -152,6 +186,9 @@ export default function JournalDetailScreen() {
         }
     };
 
+    const completedCount = checklist.filter(item => item.checked).length;
+    const completionRate = checklist.length > 0 ? completedCount / checklist.length : 0;
+
     if (loading || !startedAt) return <ActivityIndicator size="large" />;
 
     const dayNumber =
@@ -159,90 +196,78 @@ export default function JournalDetailScreen() {
             (selectedDate.getTime() - startedAt.getTime()) / (1000 * 60 * 60 * 24)
         ) + 1;
 
+    const getWeekOfMonth = (date: Date): number => {
+        const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
+        const dayOfWeek = firstDay.getDay();
+        const adjustedDate = date.getDate() + dayOfWeek;
+        return Math.ceil(adjustedDate / 7);
+    };
+
+    const weekLabel = `${baseDate.getFullYear()}-${String(
+        baseDate.getMonth() + 1
+    ).padStart(2, "0")} (${getWeekOfMonth(baseDate)}W)`;
+
+    const formattedWeekLabel = `${selectedDate.getFullYear()}-${String(
+        selectedDate.getMonth() + 1
+    ).padStart(2, "0")} (${getWeekOfMonth(selectedDate)}W)`;
+
     return (
         <>
-            {/* ✅ 상단 정보 */}
-            {/* <View style={styles.infoRow}>
-                <Text style={styles.infoText}>📘 {type}</Text>
-                <Text style={styles.infoText}>Day {dayNumber}</Text>
-                <Text style={styles.infoText}>🔥 {point}pt</Text>
-            </View> */}
-
-            {/* ✅ 달력 */}
-            {/* <Calendar
-                current={selectedDate.toISOString().slice(0, 10)}
-                onDayPress={(day: DateData) => {
-                    const selected = new Date(day.dateString);
-                    setSelectedDate(selected);
-                }}
-                markedDates={{
-                    [selectedDate.toISOString().slice(0, 10)]: {
-                        selected: true,
-                        selectedColor: Colors.light.tint,
-                    },
-                }}
-                maxDate={new Date().toISOString().slice(0, 10)}
-                style={styles.calendar}
-                theme={{
-                    textDayFontSize: 14,
-                    textMonthFontSize: 14,
-                    textDayHeaderFontSize: 12,
-                    arrowColor: Colors.light.tint,
-                }}
-            /> */}
-            {/* ✅ 달력 */}
-            {/* <View style={styles.weekRow}>
-                {weekDates.map(({ date, day }, idx) => (
-                    <View key={idx} style={styles.dateBox}>
-                        <Text style={{ fontSize: 16 }}>{day}</Text>
-                        <Text style={{ fontSize: 14, color: 'gray' }}>{date}</Text>
-                    </View>
-
-                ))}
-            </View> */}
             {/* ✅ 상단 날짜 선택 */}
-            <View style={styles.weekRow}>
-                {/* ◀ 왼쪽 주 이동 */}
+            <View style={[styles.weekRow]}>
                 <TouchableOpacity onPress={() => setBaseDate(prev => addDays(prev, -7))}>
                     <Text style={styles.dateArrow}>◀</Text>
                 </TouchableOpacity>
-
-                {/* 날짜 7개 */}
-                {weekDates.map(({ date, day }, idx) => (
-                    <TouchableOpacity
-                        key={idx}
-                        style={[
-                            styles.dateBox,
-                            format(selectedDate, 'MM-dd') === date && styles.selectedDateBox
-                        ]}
-                        onPress={() => {
-                            const fullDate = new Date(`${baseDate.getFullYear()}-${date}`);
-                            setSelectedDate(fullDate);
-                        }}
-                    >
-                        <Text
-                            style={[
-                                styles.dateText,
-                                format(selectedDate, 'MM-dd') === date && styles.selectedDateText
-                            ]}
-                        >
-                            {day}
-                        </Text>
-                        <Text
-                            style={[
-                                styles.dateSubText,
-                                format(selectedDate, 'MM-dd') === date && styles.selectedDateText
-                            ]}
-                        >
-                            {date}
-                        </Text>
-                    </TouchableOpacity>
-                ))}
-
-                {/* ▶ 오른쪽 주 이동 */}
+                <Text style={{ fontSize: 16, fontWeight: "bold" }}>{weekLabel}</Text>
                 <TouchableOpacity onPress={() => setBaseDate(prev => addDays(prev, 7))}>
                     <Text style={styles.dateArrow}>▶</Text>
                 </TouchableOpacity>
+            </View>
+            <View style={styles.dayRow}>
+
+                {/* 날짜 7개 */}
+                {weekDates.map(({ date, day, fullDate }, idx) => {
+                    const isSelected = selectedDate.toDateString() === fullDate.toDateString();
+                    const key = getKSTDateKey(fullDate);
+                    const isPerfect = completedDays[key]
+
+                    return (
+                        <TouchableOpacity
+                            key={idx}
+                            style={[styles.dateBox, isSelected && styles.selectedDateBox]}
+                            onPress={() => setSelectedDate(fullDate)}
+                        >
+                            {isPerfect && (
+                                <Text style={styles.starBadge}>🌟</Text>
+                            )}
+                            <Text style={[styles.dateText, isSelected && styles.selectedDateText]}>
+                                {day}
+                            </Text>
+                            <Text style={[styles.dateSubText, isSelected && styles.selectedDateText]}>
+                                {date}
+                            </Text>
+                        </TouchableOpacity>
+                    );
+                })}
+            </View>
+
+            {/* ✅ 체크리스트 진행 바 */}
+            <View style={styles.progressBarContainer}>
+                <View style={styles.progressBarBackground}>
+                    <View
+                        style={[
+                            styles.progressBarFilled,
+                            { width: `${completionRate * 100}%` },
+                        ]}
+                    />
+                    <View style={styles.progressBarTextWrapper}>
+                        <Text style={styles.progressBarText}>
+                            {completedCount === checklist.length
+                                ? "Perfect 🌟"
+                                : `${completedCount} / ${checklist.length}`}
+                        </Text>
+                    </View>
+                </View>
             </View>
 
             {/* ✅ 체크리스트 */}
