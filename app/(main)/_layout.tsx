@@ -131,7 +131,7 @@ export default function MainLayout() {
                     <Text style={styles.menuText}> ⋮ </Text>
                 </TouchableOpacity>
                 {/* <Text style={styles.topDate}>{currentDate}</Text> */}
-                <Text style={styles.topDday}>{journalType} ({dayNumber} days) </Text>
+                <Text style={styles.topDday}>{journalType}  ({dayNumber} days) </Text>
                 <View style={styles.topPoint}>
                     <Text style={styles.pointText}>🔥 {point} pt</Text>
                     <Text style={[styles.pointText, { marginLeft: 8 }]}>🌟 {perfectCount}</Text>
