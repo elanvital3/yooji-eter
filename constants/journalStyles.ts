@@ -94,7 +94,8 @@ export const styles = StyleSheet.create({
         backgroundColor: '#fff', // elevation은 배경색이 있어야 보임
         borderRadius: 10, // 모서리 둥글게 (선택)
         // backgroundColor: Colors.light.lightGray,  // 카드 배경 색상 수정
-        alignItems: "flex-start",
+        alignItems: "center",
+        justifyContent: "space-between",
         padding: 10,
         borderWidth: 1,
         borderColor: "#eee",
@@ -113,7 +114,7 @@ export const styles = StyleSheet.create({
     },
     startDate: {
         fontSize: 14,
-        color: Colors.light.gray, // 회색 D-Day
+        color: Colors.light.text, // 회색 D-Day
         // fontFamily: "Pretendard-Bold",
     },
 
@@ -129,13 +130,8 @@ export const styles = StyleSheet.create({
         color: Colors.light.text,
     },
 
-    toggleLabel: {
-        fontSize: 10,
-        fontWeight: "bold",
-        color: Colors.light.text,
-        flex: 1,
-        textAlign: "center",
-    },
+
+
 
     // 버튼 스타일
     title: {

@@ -1,4 +1,4 @@
-// 📁 app/(journal)/_layout.tsx
+// 📁 app/(settings)/_layout.tsx
 
 import { Slot } from "expo-router";
 import { Image, View, TouchableOpacity, Text } from "react-native";
@@ -12,12 +12,10 @@ import { db } from "../../firebase/config"; // Firestore 임포트
 import { format } from 'date-fns'; // 날짜 포맷을 위한 라이브러리
 import BottomTabBar from '../../components/BottomTabBar';
 
-export default function JournalLayout() {
+export default function SettingLayout() {
     const [nickname, setNickname] = useState<string | null>(null);
     const [isMenuVisible, setIsMenuVisible] = useState(false);  // 메뉴 표시 상태
-    // const [point, setPoint] = useState<number>(0);  // 포인트 상태
     const router = useRouter();
-    // console.log(isMenuVisible)
 
     useEffect(() => {
         const fetchUserData = async () => {

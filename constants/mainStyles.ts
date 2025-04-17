@@ -28,20 +28,8 @@ export const styles = StyleSheet.create({
         marginTop: 10,
         width: "100%",
     },
-    bottomContainer: {
-        // flex: 1,
-        width: "105%",
-        bottom: 0,
-        borderColor: "#eee",
-        paddingVertical: 10,
-        borderWidth: 1,
-        elevation: 10, // 안드로이드 전용 그림자 깊이
-        backgroundColor: '#fff', // elevation은 배경색이 있어야 보임
-        borderRadius: 30, // 모서리 둥글게 (선택)
-        flexDirection: "row",
-        justifyContent: "space-evenly",
-        alignItems: "center",          // 수평 중앙 정렬
-    },
+
+
 
     // ✅ 상단메뉴
     nickName: {
@@ -238,17 +226,6 @@ export const styles = StyleSheet.create({
         backgroundColor: Colors.light.primary,
     },
 
-    tabItem: {
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-
-    tabLabel: {
-        fontSize: 12,
-        marginTop: 4,
-        color: '#555',
-        fontFamily: 'Pretendard',
-    },
 
 
 

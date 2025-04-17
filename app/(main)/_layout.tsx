@@ -9,6 +9,7 @@ import { auth } from "../../firebase/config";
 import { useRouter } from "expo-router";
 import { useState, useEffect } from "react";
 import { db } from "../../firebase/config"; // Firestore 임포트
+import { onSnapshot } from "firebase/firestore";
 import { format } from 'date-fns'; // 날짜 포맷을 위한 라이브러리
 import {
     doc,
@@ -18,6 +19,7 @@ import {
     getDocs,
 } from "firebase/firestore";
 import { MaterialIcons, Ionicons } from '@expo/vector-icons'; // 휴지통 아이콘용
+import BottomTabBar from '../../components/BottomTabBar';
 
 type ChecklistItem = {
     title: string;
@@ -35,6 +37,7 @@ export default function MainLayout() {
     const [checklist, setChecklist] = useState<ChecklistItem[]>([]);
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [loading, setLoading] = useState(true);
+    const [perfectCount, setPerfectCount] = useState<number>(0);
 
     const dateKey = selectedDate.toISOString().slice(0, 10); // e.g. "2025-04-03"
 
@@ -55,53 +58,52 @@ export default function MainLayout() {
     }, []);
 
     useEffect(() => {
-        const fetchData = async () => {
-            if (!journalId) return;
+        if (!journalId) return;
 
-            const journalRef = doc(db, "journals", journalId as string);
-            const journalSnap = await getDoc(journalRef);
+        const unsubscribe = onSnapshot(
+            collection(db, `journals/${journalId}/dailyLogs`),
+            async (snapshot) => {
+                const journalRef = doc(db, "journals", journalId as string);
+                const journalSnap = await getDoc(journalRef);
 
-            if (!journalSnap.exists()) {
-                Alert.alert("오류", "유지일기 데이터를 찾을 수 없습니다.");
-                return;
-            }
+                if (!journalSnap.exists()) {
+                    Alert.alert("오류", "유지일기 데이터를 찾을 수 없습니다.");
+                    return;
+                }
 
-            const journalData = journalSnap.data();
-            setType(journalData.type);
-            setStartedAt(journalData.startedAt.toDate());
+                const journalData = journalSnap.data();
+                setType(journalData.type);
+                setStartedAt(journalData.startedAt.toDate());
 
-            // 총 점수 계산
-            const logsSnapshot = await getDocs(collection(db, `journals/${journalId}/dailyLogs`));
-            let totalPoints = 0;
-            logsSnapshot.forEach((doc) => {
-                const items: ChecklistItem[] = doc.data().checklist || [];
-                const checkedCount = items.filter((item) => item.checked).length;
-                totalPoints += checkedCount;
-                // if (checkedCount === items.length && items.length > 0) {
-                //     totalPoints += 3; // 보너스
-                // }
-            });
-            setPoint(totalPoints);
+                let totalPoints = 0;
+                let totalPerfect = 0;
 
-            const dailyLogRef = doc(db, `journals/${journalId}/dailyLogs/${dateKey}`);
-            const dailySnap = await getDoc(dailyLogRef);
+                snapshot.forEach((doc) => {
+                    const items: ChecklistItem[] = doc.data().checklist || [];
+                    const checkedCount = items.filter((item) => item.checked).length;
+                    totalPoints += checkedCount;
 
-            if (dailySnap.exists()) {
-                setChecklist(dailySnap.data().checklist);
-            } else {
-                const baseChecklist: ChecklistItem[] = journalData.checklist.map(
-                    (item: ChecklistItem) => ({
-                        ...item,
-                        checked: false,
-                    })
+                    if (items.length > 0 && checkedCount === items.length) {
+                        totalPerfect += 1;
+                    }
+                });
+
+                setPoint(totalPoints);
+                setPerfectCount(totalPerfect);
+
+                // 현재 날짜에 해당하는 checklist만 따로 설정
+                const todayLog = snapshot.docs.find(
+                    (doc) => doc.id === dateKey
                 );
-                setChecklist(baseChecklist);
+                if (todayLog && todayLog.exists()) {
+                    setChecklist(todayLog.data().checklist);
+                }
+
+                setLoading(false);
             }
+        );
 
-            setLoading(false);
-        };
-
-        fetchData();
+        return () => unsubscribe(); // 🔁 언마운트 시 구독 해제
     }, [journalId, dateKey]);
 
     const handleLogout = async () => {
@@ -132,6 +134,7 @@ export default function MainLayout() {
                 <Text style={styles.topDday}>{journalType} ({dayNumber} days) </Text>
                 <View style={styles.topPoint}>
                     <Text style={styles.pointText}>🔥 {point} pt</Text>
+                    <Text style={[styles.pointText, { marginLeft: 8 }]}>🌟 {perfectCount}</Text>
                 </View>
                 {isMenuVisible && (
                     <>
@@ -181,7 +184,9 @@ export default function MainLayout() {
                 <Slot />
             </View>
 
-            <View style={styles.bottomContainer}>
+            <BottomTabBar />
+
+            {/* <View style={styles.bottomContainer}>
                 <TouchableOpacity style={styles.tabItem}>
                     <Ionicons name="home-outline" size={24} color="#555" />
                     <Text style={styles.tabLabel}>홈</Text>
@@ -194,7 +199,7 @@ export default function MainLayout() {
                     <Ionicons name="person-outline" size={24} color="#555" />
                     <Text style={styles.tabLabel}>설정</Text>
                 </TouchableOpacity>
-            </View>
+            </View> */}
         </View>
     );
 }
