@@ -1,13 +1,15 @@
 // 📁 hooks/useDailyPushNotification.ts
 import { useEffect } from "react";
 import * as Notifications from "expo-notifications";
-import { Platform } from "react-native";
+import { doc, getDoc } from "firebase/firestore";
+import { auth, db } from "../firebase/config";
 
 export function useDailyPushNotification(enabled: boolean) {
     useEffect(() => {
         if (!enabled) return;
 
         const scheduleDailyPush = async () => {
+            // 1. 권한 확인
             const permission = await Notifications.getPermissionsAsync();
             if (!permission.granted) {
                 const request = await Notifications.requestPermissionsAsync();
@@ -17,34 +19,40 @@ export function useDailyPushNotification(enabled: boolean) {
                 }
             }
 
-            // 📅 오늘 20시로 알림 예약
-            const now = new Date();
-            const scheduledTime = new Date(
-                now.getFullYear(),
-                now.getMonth(),
-                now.getDate(),
-                20, 0, 0
-            );
-            if (scheduledTime < now) {
-                scheduledTime.setDate(scheduledTime.getDate() + 1);
+            // 2. Firestore에서 알림 시간 목록 가져오기
+            if (!auth.currentUser) return;
+            const ref = doc(db, "users", auth.currentUser.uid, "settings", "notification");
+            const snap = await getDoc(ref);
+            const hours: number[] = snap.exists() ? snap.data().hours || [] : [];
+
+            if (hours.length === 0) {
+                console.log("⚠️ 예약할 알림 시간이 없습니다.");
+                return;
             }
 
-            await Notifications.scheduleNotificationAsync({
-                content: {
-                    title: "🔥 유지어터 체크!",
-                    body: "오늘도 식단/운동 완료하셨나요?",
-                    data: {
-                        dateKey: scheduledTime.toISOString().slice(0, 10),
-                    },
-                },
-                trigger: {
-                    type: "daily",
-                    hour: 20,
-                    minute: 0,
-                } as Notifications.DailyTriggerInput, // ✅ 여기까지 명시해줘야 타입 인식 OK
-            });
+            // 3. 기존 예약 취소
+            await Notifications.cancelAllScheduledNotificationsAsync();
 
-            console.log("✅ 매일 20시 알림 예약 완료");
+            // 4. 알림 예약
+            for (const hour of hours) {
+                await Notifications.scheduleNotificationAsync({
+                    content: {
+                        title: "🔥 유지어터 체크!",
+                        body: "오늘도 식단/운동 완료하셨나요?",
+                        data: {
+                            dateKey: new Date().toISOString().slice(0, 10),
+                        },
+                    },
+                    trigger: {
+                        type: "daily",
+                        hour,
+                        minute: 0,
+                        repeats: true,
+                    } as Notifications.DailyTriggerInput,
+                });
+            }
+
+            console.log(`✅ ${hours.length}개의 시간에 알림 예약 완료:`, hours);
         };
 
         scheduleDailyPush();

@@ -6,6 +6,7 @@ import {
     TouchableOpacity,
     ActivityIndicator,
     FlatList,
+    Alert,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { styles } from "../../constants/journalStyles";
@@ -32,6 +33,10 @@ type Journal = {
     status: string;
     point: number;
     perfectCount: number;
+    period: number;
+    goalType: "weight" | "bodyFat" | "muscle";
+    currentValue: number;
+    targetValue: number;
 };
 
 export default function HomeScreen() {
@@ -67,6 +72,10 @@ export default function HomeScreen() {
                     status: data.status || "in_progress",
                     point,
                     perfectCount,
+                    period: data.period,
+                    goalType: data.goalType,
+                    currentValue: data.currentValue,
+                    targetValue: data.targetValue,
                 };
             })
         );
@@ -128,10 +137,28 @@ export default function HomeScreen() {
     };
 
     const calculateDays = (startDate: string) => {
-        const start = new Date(new Date(startDate).getTime() + 9 * 60 * 60 * 1000); // KST 보정
+        const start = new Date(new Date(startDate).getTime() + 9 * 60 * 60 * 1000);
         const now = new Date(new Date().getTime() + 9 * 60 * 60 * 1000);
         const diffTime = now.getTime() - start.getTime();
         return Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+    };
+
+    const confirmDelete = (targetId: string) => {
+        Alert.alert(
+            "정말 삭제하시겠어요?",
+            "삭제된 일기는 복구할 수 없습니다.",
+            [
+                {
+                    text: "취소",
+                    style: "cancel",
+                },
+                {
+                    text: "삭제",
+                    style: "destructive",
+                    onPress: () => handleDelete(targetId),
+                },
+            ]
+        );
     };
 
     if (loading) return <ActivityIndicator size="large" />;
@@ -168,8 +195,7 @@ export default function HomeScreen() {
                                             {item.type} ({calculateDays(item.startedAt)} Day)
                                         </Text>
                                         <Text style={styles.startDate}>
-                                            시작일 :{" "}
-                                            {format(new Date(item.startedAt), "yyyy-MM-dd")}
+                                            시작일 : {format(new Date(item.startedAt), "yy-MM-dd")}
                                         </Text>
                                     </View>
                                 </View>
@@ -192,8 +218,18 @@ export default function HomeScreen() {
                                         thumbColor="#ffffff"
                                     />
 
+                                    <TouchableOpacity
+                                        onPress={() =>
+                                            router.push({
+                                                pathname: "/(journal)/editGoal",
+                                                params: { journalId: item.id },
+                                            })
+                                        }
+                                    >
+                                        <Ionicons name="create-outline" size={20} style={styles.editIcon} />
+                                    </TouchableOpacity>
 
-                                    <TouchableOpacity onPress={() => handleDelete(item.id)}>
+                                    <TouchableOpacity onPress={() => confirmDelete(item.id)}>
                                         <Ionicons
                                             name="trash-outline"
                                             size={20}
@@ -203,6 +239,18 @@ export default function HomeScreen() {
                                 </View>
                                 <Text style={styles.startDate}>
                                     🔥 {item.point} pt  |  🌟 {item.perfectCount}
+                                </Text>
+                                <Text style={styles.startDate}>
+                                    ⏳ {calculateDays(item.startedAt)} / {item.period}일 진행 중
+                                </Text>
+                                <Text style={styles.startDate}>
+                                    🎯 목표 {item.goalType === "bodyFat"
+                                        ? "체지방률"
+                                        : item.goalType === "muscle"
+                                            ? "근골격량"
+                                            : "체중"}:
+                                    {item.currentValue} → {item.targetValue}
+                                    {item.goalType === "bodyFat" ? "%" : "kg"}
                                 </Text>
                             </View>
                         </View>
@@ -214,7 +262,7 @@ export default function HomeScreen() {
 
             <TouchableOpacity
                 style={styles.startButton}
-                onPress={() => router.push("/(journal)/selectDietType")}
+                onPress={() => router.push("/(journal)/setGoal")}
             >
                 <Text style={styles.startButtonText}>유지일기 생성하기</Text>
             </TouchableOpacity>

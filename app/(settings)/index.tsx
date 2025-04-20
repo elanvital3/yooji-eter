@@ -1,10 +1,10 @@
-// 파일: 프로젝트 경로: app/(settings)/index.tsx
-
-import { View, Text, TouchableOpacity } from 'react-native';
+// 📁 app/(settings)/index.tsx
+import { View, Text, TouchableOpacity, Alert } from 'react-native';
 import { useEffect, useState } from 'react';
 import { styles } from '../../constants/settingsStyles';
 import { auth, db } from '../../firebase/config';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
+import { saveAndScheduleNotifications } from '../../utils/notificationUtils'; // ✅ 유틸 임포트
 
 export default function SettingsScreen() {
     const [alarmHours, setAlarmHours] = useState<number[]>([]);
@@ -15,24 +15,27 @@ export default function SettingsScreen() {
             const ref = doc(db, "users", auth.currentUser.uid, "settings", "notification");
             const snap = await getDoc(ref);
             if (snap.exists()) {
-                setAlarmHours(snap.data().hours || []);
+                const data = snap.data();
+                setAlarmHours(data.hours || []);
             }
         };
         fetchTimes();
     }, []);
 
     const toggleHour = async (hour: number) => {
-        let updated: number[];
-        if (alarmHours.includes(hour)) {
-            updated = alarmHours.filter((h) => h !== hour);
-        } else {
-            updated = [...alarmHours, hour];
-        }
-        setAlarmHours(updated);
+        try {
+            const updated = alarmHours.includes(hour)
+                ? alarmHours.filter((h) => h !== hour)
+                : [...alarmHours, hour];
 
-        if (auth.currentUser) {
-            const ref = doc(db, "users", auth.currentUser.uid, "settings", "notification");
-            await setDoc(ref, { hours: updated }, { merge: true });
+            setAlarmHours(updated);
+
+            await saveAndScheduleNotifications(updated); // ✅ 저장 + 예약 한방 처리
+
+            console.log("✅ 알림 설정 완료:", updated);
+        } catch (err) {
+            console.error("❌ 알림 설정 중 오류:", err);
+            Alert.alert("오류", "알림 설정 중 문제가 발생했습니다.");
         }
     };
 
@@ -45,14 +48,14 @@ export default function SettingsScreen() {
                         key={i}
                         style={[
                             styles.hourBox,
-                            alarmHours.includes(i) && styles.hourBoxSelected
+                            alarmHours.includes(i) && styles.hourBoxSelected,
                         ]}
                         onPress={() => toggleHour(i)}
                     >
                         <Text
                             style={[
                                 styles.hourText,
-                                alarmHours.includes(i) && styles.hourTextSelected
+                                alarmHours.includes(i) && styles.hourTextSelected,
                             ]}
                         >
                             {i}시

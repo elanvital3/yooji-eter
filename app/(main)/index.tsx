@@ -7,12 +7,14 @@ import {
     StyleSheet,
     ActivityIndicator,
     Alert,
+    TextInput,
 } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { db } from "../../firebase/config";
 import {
     doc,
     getDoc,
+    updateDoc,
     setDoc,
     collection,
     getDocs,
@@ -54,6 +56,12 @@ export default function JournalDetailScreen() {
     const [weekDates, setWeekDates] = useState<WeekDay[]>([]);
     const [completedDays, setCompletedDays] = useState<Record<string, boolean>>({});
 
+    const [goalType, setGoalType] = useState("");
+    const [currentValue, setCurrentValue] = useState<number | null>(null);
+    const [targetValue, setTargetValue] = useState<number | null>(null);
+    const [newTarget, setNewTarget] = useState<string>("");
+
+
     const getKSTDateKey = (date: Date) => {
         const tzOffset = date.getTime() + 9 * 60 * 60 * 1000; // UTC+9
         return new Date(tzOffset).toISOString().slice(0, 10);
@@ -76,6 +84,9 @@ export default function JournalDetailScreen() {
             const journalData = journalSnap.data();
             setType(journalData.type);
             setStartedAt(journalData.startedAt.toDate());
+            setGoalType(journalData.goalType);
+            setCurrentValue(journalData.currentValue);
+            setTargetValue(journalData.targetValue);
 
             // 총 점수 계산
             const logsSnapshot = await getDocs(collection(db, `journals/${journalId}/dailyLogs`));
@@ -114,6 +125,24 @@ export default function JournalDetailScreen() {
 
         fetchData();
     }, [journalId, dateKey]);
+
+    const handleSaveDailyMeasurement = async () => {
+        if (!newTarget || !journalId) return;
+        try {
+            const ref = doc(db, `journals/${journalId}/dailyLogs/${dateKey}`);
+            await setDoc(ref, {
+                checklist,
+                completedAt: new Date(),
+                dailyMeasurement: parseFloat(newTarget),
+            }, { merge: true });
+
+            setNewTarget("");
+            Alert.alert("성공", "오늘 수치가 저장되었습니다.");
+        } catch (err) {
+            console.error("오늘 수치 저장 실패:", err);
+            Alert.alert("오류", "오늘 수치 저장 중 문제가 발생했습니다.");
+        }
+    };
 
 
     useEffect(() => {
@@ -252,7 +281,11 @@ export default function JournalDetailScreen() {
             </View>
 
             {/* ✅ 체크리스트 진행 바 */}
+
             <View style={styles.progressBarContainer}>
+                <Text style={styles.goalLabel}>
+                    📋 Check List
+                </Text>
                 <View style={styles.progressBarBackground}>
                     <View
                         style={[
@@ -272,6 +305,7 @@ export default function JournalDetailScreen() {
 
             {/* ✅ 체크리스트 */}
             <View style={styles.checkListContainer}>
+
                 {checklist.map((item, index) => (
                     <TouchableOpacity
                         key={index}
@@ -294,6 +328,29 @@ export default function JournalDetailScreen() {
                     </TouchableOpacity>
                 ))}
             </View >
+
+            {/* ✅ 목표 정보 입력란 */}
+            {(goalType && targetValue !== null && currentValue !== null) && (
+                <View style={styles.goalContainer}>
+                    <Text style={styles.goalLabel}>
+                        🎯 목표 ({goalType === 'weight' ? '체중' : goalType === 'bodyFat' ? '체지방률' : '근골격량'}): {targetValue}{goalType === 'bodyFat' ? '%' : 'kg'}
+                    </Text>
+                    <View style={styles.goalRow}>
+                        <TextInput
+                            value={newTarget}
+                            onChangeText={setNewTarget}
+                            placeholder={`오늘 수치 (${goalType === 'bodyFat' ? '%' : 'kg'})`}
+                            keyboardType="numeric"
+                            style={styles.goalInput}
+                        />
+                        <TouchableOpacity onPress={handleSaveDailyMeasurement} style={styles.savebutton}>
+                            <Text style={styles.saveText}>저장</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            )}
+
+
         </>
     );
 }

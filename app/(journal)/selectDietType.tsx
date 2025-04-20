@@ -1,8 +1,8 @@
 // 📁 app/(journal)/selectDietType.tsx
-import { View, Text, TouchableOpacity, Button } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 import { useState } from "react";
-import { useRouter } from "expo-router";
-import { styles } from "../../constants/journalStyles";  // 공통 스타일 임포트
+import { useRouter, useLocalSearchParams } from "expo-router";
+import { styles } from "../../constants/journalStyles";
 
 const dietOptions = [
     { key: "switch_on", label: "스위치온" },
@@ -13,12 +13,19 @@ const dietOptions = [
 export default function SelectDietTypeScreen() {
     const [selected, setSelected] = useState<string | null>(null);
     const router = useRouter();
+    const { period, goalType, currentValue, targetValue } = useLocalSearchParams();
 
     const handleNext = () => {
         if (selected) {
             router.push({
-                pathname: "/(journal)/inputStartWeight",
-                params: { type: selected },
+                pathname: "/(journal)/createChecklist",
+                params: {
+                    type: selected,
+                    period: period?.toString(),
+                    goalType: goalType?.toString(),
+                    currentValue: currentValue?.toString(),
+                    targetValue: targetValue?.toString(),
+                },
             });
         }
     };
@@ -50,8 +57,6 @@ export default function SelectDietTypeScreen() {
             <TouchableOpacity onPress={handleNext} disabled={!selected}>
                 <Text style={[styles.buttonText, !selected && styles.disabledText]}>다음</Text>
             </TouchableOpacity>
-
-
         </View>
     );
 }

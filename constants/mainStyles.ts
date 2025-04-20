@@ -9,7 +9,7 @@ export const styles = StyleSheet.create({
         justifyContent: "space-between",  // 캐릭터가 화면 상단에 오도록
         alignItems: "center",          // 수평 중앙 정렬
         paddingHorizontal: 12,
-        marginTop: "10%"
+        marginTop: "5%"
         // paddingTop: "50%",                // 캐릭터 위쪽 공간을 늘려 캐릭터를 더 상단에 배치
     },
     topContainer: {
@@ -191,7 +191,6 @@ export const styles = StyleSheet.create({
     },
 
     // ✅ check list 화면
-
     checkListContainer: { gap: 10, width: "100%", marginTop: 10, }, // 간격 좁힘
     itemRow: {
         elevation: 2, // 안드로이드 전용 그림자 깊이
@@ -199,12 +198,12 @@ export const styles = StyleSheet.create({
         borderRadius: 10, // 모서리 둥글게 (선택)
         justifyContent: "space-between",
         flexDirection: "row",
-        padding: 10, // 간격 좁힘
+        padding: 8, // 간격 좁힘
         borderBottomWidth: 1,
         borderColor: "#eee",
     },
     itemText: {
-        fontSize: 18,
+        fontSize: 16,
         color: Colors.light.text,
         fontFamily: "Pretendard-Bold",
     },
@@ -225,6 +224,44 @@ export const styles = StyleSheet.create({
         borderRadius: 6,
         backgroundColor: Colors.light.primary,
     },
+
+    // ✅ 현재값 입력    
+
+    goalContainer: {
+        width: "100%",
+        marginTop: 10,
+    },
+    goalLabel: {
+        fontSize: 16,
+        fontFamily: "Pretendard-Bold",
+        marginBottom: 6,
+        color: Colors.light.text,
+        alignSelf: "flex-start"
+    },
+    goalInput: {
+        borderWidth: 1,
+        borderColor: Colors.light.gray,
+        borderRadius: 8,
+        padding: 8,
+        flex: 1
+    },
+
+    goalRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10
+    },
+    savebutton: {
+        paddingVertical: 8,
+        paddingHorizontal: 12,
+        backgroundColor: Colors.light.primary,
+        borderRadius: 8
+    },
+
+    saveText: {
+        color: 'white',
+        fontFamily: "Pretendard-Bold",
+    }
 
 
 

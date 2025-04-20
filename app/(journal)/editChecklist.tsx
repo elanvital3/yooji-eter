@@ -1,10 +1,9 @@
-// 📁 app/(journal)/editChecklist.tsx
+// 파일: 프로젝트 경로: app/(journal)/editChecklist.tsx
 
 import {
     View,
     Text,
     TextInput,
-    Button,
     FlatList,
     TouchableOpacity,
     Alert,
@@ -12,48 +11,40 @@ import {
 import { useEffect, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { auth, db } from "../../firebase/config";
-import { collection, addDoc, serverTimestamp, where, query, getDocs } from "firebase/firestore";
-import { styles } from "../../constants/journalStyles";  // 공통 스타일 임포트
-import { Colors } from "../../constants/Colors"; // Colors 임포트
-import { MaterialIcons, Ionicons } from '@expo/vector-icons'; // 휴지통 아이콘용
+import {
+    collection,
+    doc,
+    getDoc,
+    updateDoc,
+} from "firebase/firestore";
+import { styles } from "../../constants/journalStyles";
+import { Colors } from "../../constants/Colors";
+import { Ionicons } from "@expo/vector-icons";
 
-const CHECKLIST_PRESETS: Record<string, string[]> = {
-    switch_on: [
-        "운동",
-        "저녁 무탄수 식단",
-        "금주",
-        "공복 14시간",
-        "액상과당 섭취 X",
-        "물 2L 섭취",
-        "밀가루, 튀김음식 섭취 X",
-        "7시간 숙면",
-    ],
-    low_carb: [
-        "탄수화물 20g 이하",
-        "지방 위주 식단",
-        "공복 16시간",
-        "스트레칭 10분 이상",
-    ],
-    vegetarian: [
-        "육류 섭취 X",
-        "야채 위주 식단",
-        "탄수화물 균형 유지",
-        "유제품 적당량 섭취",
-    ],
+type ChecklistItem = {
+    title: string;
+    checked: boolean;
 };
 
 export default function EditChecklistScreen() {
     const router = useRouter();
-    const { type, startWeight } = useLocalSearchParams();
-    const [checklist, setChecklist] = useState<string[]>([]);
+    const { journalId, period, goalType, currentValue, targetValue } = useLocalSearchParams();
+    const [checklist, setChecklist] = useState<ChecklistItem[]>([]);
     const [newItem, setNewItem] = useState("");
     const [editingIndex, setEditingIndex] = useState<number | null>(null);
     const [editingText, setEditingText] = useState("");
 
     useEffect(() => {
-        const initial = CHECKLIST_PRESETS[type as string] || [];
-        setChecklist(initial);
-    }, [type]);
+        const fetchChecklist = async () => {
+            if (!journalId || !auth.currentUser) return;
+            const ref = doc(db, "journals", journalId as string);
+            const snap = await getDoc(ref);
+            if (snap.exists()) {
+                setChecklist(snap.data().checklist || []);
+            }
+        };
+        fetchChecklist();
+    }, [journalId]);
 
     const handleRemove = (index: number) => {
         const updated = [...checklist];
@@ -64,13 +55,13 @@ export default function EditChecklistScreen() {
     const handleAdd = () => {
         const trimmed = newItem.trim();
         if (trimmed.length === 0) return;
-        setChecklist([...checklist, trimmed]);
+        setChecklist([...checklist, { title: trimmed, checked: false }]);
         setNewItem("");
     };
 
     const handleStartEdit = (index: number) => {
         setEditingIndex(index);
-        setEditingText(checklist[index]);
+        setEditingText(checklist[index].title);
     };
 
     const handleCancelEdit = () => {
@@ -79,52 +70,35 @@ export default function EditChecklistScreen() {
     };
 
     const handleSaveEdit = () => {
-        if (editingText.trim().length === 0) return;
+        if (editingText.trim().length === 0 || editingIndex === null) return;
         const updated = [...checklist];
-        updated[editingIndex!] = editingText.trim();
+        updated[editingIndex].title = editingText.trim();
         setChecklist(updated);
         handleCancelEdit();
     };
 
-    const handleCreate = async () => {
-        const user = auth.currentUser;
-        if (!user || !type || !startWeight) {
-            Alert.alert("정보 누락", "모든 필수 정보를 확인해주세요.");
-            return;
-        }
-
+    const handleSaveToFirestore = async () => {
+        if (!auth.currentUser || !journalId) return;
         try {
-            // ✅ 기존 활성화된 저널이 있는지 확인
-            const q = query(
-                collection(db, "journals"),
-                where("userId", "==", user.uid),
-                where("status", "==", "in_progress")
-            );
-            const snapshot = await getDocs(q);
-            const alreadyActive = !snapshot.empty;
-
-            // ✅ 새로 만들 저널 데이터 구성
-            const data = {
-                userId: user.uid,
-                type,
-                startWeight: parseFloat(startWeight as string),
-                startedAt: serverTimestamp(),
-                status: alreadyActive ? "inactive" : "in_progress",
-                checklist: checklist.map((title) => ({ title, checked: false })),
-            };
-
-            // ✅ Firestore에 저장
-            await addDoc(collection(db, "journals"), data);
+            const ref = doc(db, "journals", journalId as string);
+            await updateDoc(ref, {
+                checklist,
+                period: parseInt(period as string),
+                goalType,
+                currentValue: parseFloat(currentValue as string),
+                targetValue: parseFloat(targetValue as string),
+            });
+            Alert.alert("저장 완료", "체크리스트가 성공적으로 저장되었습니다.");
             router.replace("/(journal)");
         } catch (err) {
-            console.error("Firestore 저장 오류:", err);
+            console.error("체크리스트 저장 실패:", err);
             Alert.alert("오류", "저장 중 문제가 발생했습니다.");
         }
     };
 
     return (
         <View style={styles.journalContainer}>
-            <Text style={styles.title}>체크리스트를 수정해주세요</Text>
+            <Text style={styles.title}>체크리스트 수정</Text>
             <FlatList
                 data={checklist}
                 keyExtractor={(_, index) => index.toString()}
@@ -137,26 +111,35 @@ export default function EditChecklistScreen() {
                                     value={editingText}
                                     onChangeText={setEditingText}
                                 />
-                                <TouchableOpacity onPress={handleSaveEdit} style={styles.editSaveButton}>
+                                <TouchableOpacity
+                                    onPress={handleSaveEdit}
+                                    style={styles.editSaveButton}
+                                >
                                     <Text style={styles.editSaveText}>저장</Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity onPress={handleCancelEdit} style={styles.editCancelButton}>
+                                <TouchableOpacity
+                                    onPress={handleCancelEdit}
+                                    style={styles.editCancelButton}
+                                >
                                     <Text style={styles.editCancelText}>취소</Text>
                                 </TouchableOpacity>
                             </View>
                         ) : (
                             <View style={styles.checkCard}>
-                                {/* 텍스트를 클릭하면 수정 모드로 들어가도록 수정 */}
-                                <TouchableOpacity onPress={() => handleStartEdit(index)}>
-                                    <Text style={styles.checkCardText}>{item}</Text>
+                                <TouchableOpacity
+                                    onPress={() => handleStartEdit(index)}
+                                >
+                                    <Text style={styles.checkCardText}>{item.title}</Text>
                                 </TouchableOpacity>
-                                {/* 삭제 아이콘을 카드 밖으로 배치 */}
-                                <TouchableOpacity onPress={() => handleRemove(index)} >
-                                    <Ionicons name="trash-outline" size={20} style={styles.deleteIcon} />
+                                <TouchableOpacity onPress={() => handleRemove(index)}>
+                                    <Ionicons
+                                        name="trash-outline"
+                                        size={20}
+                                        style={styles.deleteIcon}
+                                    />
                                 </TouchableOpacity>
                             </View>
                         )}
-
                     </View>
                 )}
             />
@@ -165,7 +148,7 @@ export default function EditChecklistScreen() {
                     value={newItem}
                     onChangeText={setNewItem}
                     placeholder="추가하기"
-                    keyboardType="default"  // 기본 키보드 설정
+                    keyboardType="default"
                     placeholderTextColor={Colors.light.primary}
                     style={styles.newInput}
                 />
@@ -174,8 +157,11 @@ export default function EditChecklistScreen() {
                 </TouchableOpacity>
             </View>
 
-            <TouchableOpacity style={styles.startButton} onPress={handleCreate}>
-                <Text style={styles.startButtonText}>유지일기 시작하기</Text>
+            <TouchableOpacity
+                style={styles.startButton}
+                onPress={handleSaveToFirestore}
+            >
+                <Text style={styles.startButtonText}>체크리스트 저장</Text>
             </TouchableOpacity>
         </View>
     );

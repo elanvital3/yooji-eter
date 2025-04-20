@@ -11,6 +11,7 @@ import { useDailyPushNotification } from "../hooks/useDailyPushNotification";
 import { doc, setDoc, query, where, getDocs, collection } from "firebase/firestore";
 import { auth, db } from "../firebase/config";
 import { useRouter } from "expo-router";
+import { useVersionCheck } from "../hooks/useVersionCheck";
 
 // ✅ 앱이 foreground(열려 있을 때)에도 알림 UI 띄우도록 설정
 Notifications.setNotificationHandler({
@@ -28,6 +29,8 @@ export default function RootLayout() {
     "Pretendard-Bold": require("../assets/fonts/Pretendard-Bold.ttf"),
     "Pretendard": require("../assets/fonts/Pretendard-Regular.ttf"),
   });
+
+  useVersionCheck(); // 🟣 앱 버전 체크 (앱 시작 시 단 1회 실행)
 
   const token = usePushToken();
   const user = useCurrentUser(); // 👉 uid 확인 가능

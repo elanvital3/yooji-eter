@@ -10,7 +10,7 @@ export const styles = StyleSheet.create({
         justifyContent: "space-between",  // 캐릭터가 화면 상단에 오도록
         alignItems: "center",          // 수평 중앙 정렬
         paddingHorizontal: 12,
-        marginTop: "10%"
+        marginTop: "5%"
         // paddingTop: "50%",                // 캐릭터 위쪽 공간을 늘려 캐릭터를 더 상단에 배치
     },
     topContainer: {
@@ -129,6 +129,9 @@ export const styles = StyleSheet.create({
     deleteIcon: {
         color: Colors.light.text,
     },
+    editIcon: {
+        color: Colors.light.text,
+    },
 
 
 
@@ -173,7 +176,7 @@ export const styles = StyleSheet.create({
     },
 
 
-    // ✅ 체중입력
+    // ✅ 목표입력
     buttonText: {
         color: Colors.light.primary, // 버튼 텍스트 색상
         fontSize: 16,
@@ -194,6 +197,34 @@ export const styles = StyleSheet.create({
         padding: 12,
         borderRadius: 8,
         marginBottom: 5,
+    },
+
+    label: {
+        fontSize: 16,
+        fontWeight: "bold",
+        fontFamily: "Pretendard-Bold",
+        marginTop: 20,
+        marginBottom: 6,
+        color: Colors.light.text,
+    },
+    radioRow: {
+        flexDirection: "row",
+        gap: 10,
+    },
+    radioButton: {
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        borderRadius: 20,
+        borderWidth: 1,
+        borderColor: Colors.light.primary,
+    },
+    radioSelected: {
+        backgroundColor: Colors.light.primary,
+    },
+    radioText: {
+        color: Colors.light.text,
+        fontFamily: "Pretendard-Bold",
+        fontWeight: "500",
     },
 
 

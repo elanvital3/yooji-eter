@@ -8,7 +8,7 @@
       "android",
       "web"
     ],
-    "version": "1.0.5",
+    "version": "1.0.6",
     "orientation": "portrait",
     "icon": "./assets/images/mainCharacter.png",
     "userInterfaceStyle": "automatic",
@@ -62,6 +62,7 @@
       "eas": {
         "projectId": "8ad399dc-bfd0-4703-8a20-dc99c6a5f5ad"
       }
-    }
+    },
+    "owner": "elanvital3"
   }
 }
