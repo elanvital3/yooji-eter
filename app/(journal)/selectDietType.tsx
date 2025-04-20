@@ -13,13 +13,21 @@ const dietOptions = [
 export default function SelectDietTypeScreen() {
     const [selected, setSelected] = useState<string | null>(null);
     const router = useRouter();
-    const { period, goalType, currentValue, targetValue } = useLocalSearchParams();
+
+    const {
+        title,           // ✅ 추가
+        period,
+        goalType,
+        currentValue,
+        targetValue
+    } = useLocalSearchParams();
 
     const handleNext = () => {
         if (selected) {
             router.push({
                 pathname: "/(journal)/createChecklist",
                 params: {
+                    title: title?.toString(), // ✅ 추가
                     type: selected,
                     period: period?.toString(),
                     goalType: goalType?.toString(),

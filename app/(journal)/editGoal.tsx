@@ -1,4 +1,4 @@
-// 📁 app/(journal)/editGoal.tsx
+// 파일: 프로젝트 경로: app/(journal)/editGoal.tsx
 
 import { useEffect, useState } from "react";
 import {
@@ -18,13 +18,14 @@ export default function EditGoalScreen() {
     const router = useRouter();
 
     const [loading, setLoading] = useState(true);
+    const [title, setTitle] = useState<string>("");
     const [type, setType] = useState<string>("switch_on");
     const [period, setPeriod] = useState<string>("");
     const [goalType, setGoalType] = useState<"weight" | "bodyFat" | "muscle">("weight");
     const [currentValue, setCurrentValue] = useState<string>("");
     const [targetValue, setTargetValue] = useState<string>("");
 
-    const isDisabled = !period || !currentValue || !targetValue;
+    const isDisabled = !title || !period || !currentValue || !targetValue;
 
     useEffect(() => {
         const fetchGoalData = async () => {
@@ -34,6 +35,7 @@ export default function EditGoalScreen() {
             if (!snap.exists()) return;
 
             const data = snap.data();
+            setTitle(data.title || "");
             setType(data.type || "switch_on");
             setPeriod(data.period?.toString() || "");
             setGoalType(data.goalType || "weight");
@@ -49,6 +51,7 @@ export default function EditGoalScreen() {
             pathname: "/(journal)/editChecklist",
             params: {
                 journalId,
+                title,
                 type,
                 period,
                 goalType,
@@ -62,7 +65,15 @@ export default function EditGoalScreen() {
 
     return (
         <View style={styles.journalContainer}>
-            <Text style={styles.label}>챌린지 기간 (일)</Text>
+            <Text style={styles.label}>일기 이름</Text>
+            <TextInput
+                style={styles.input}
+                value={title}
+                onChangeText={setTitle}
+                placeholder="예: 4월 달성 참여하기"
+            />
+
+            <Text style={styles.label}>차량지 기간 (일)</Text>
             <TextInput
                 style={styles.input}
                 keyboardType="numeric"

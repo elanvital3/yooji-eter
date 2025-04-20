@@ -28,13 +28,22 @@ export const styles = StyleSheet.create({
     bottomTabLabel: {
         fontSize: 14,
         textAlign: 'center',
-        fontFamily: "Pretendard-Bold",
+        fontFamily: "Pretendard",
         marginTop: 2,
         color: Colors.light.text,
     },
 
     bottomTabIcon: {
         color: Colors.light.text,
-    }
+    },
+
+    activeTabIcon: {
+        color: Colors.light.primary,
+        fontFamily: "Pretendard-Bold",
+    },
+    activeTabLabel: {
+        color: Colors.light.primary,
+        fontFamily: "Pretendard-Bold",
+    },
 
 })

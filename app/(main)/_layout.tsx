@@ -119,8 +119,13 @@ export default function MainLayout() {
     // console.log(startedAt.getTime())
     const dayNumber =
         startedAt
-            ? Math.floor((selectedDate.getTime() - startedAt.getTime()) / (1000 * 60 * 60 * 24)) + 1
-            : 0; // startedAt이 null이면 0으로 처리
+            ? Math.floor(
+                (
+                    selectedDate.getTime() + 9 * 60 * 60 * 1000 -
+                    startedAt.getTime()
+                ) / (1000 * 60 * 60 * 24)
+            ) + 1
+            : 0;
 
     return (
         <View style={styles.mainContainer}>

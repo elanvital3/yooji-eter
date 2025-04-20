@@ -28,7 +28,7 @@ type ChecklistItem = {
 
 export default function EditChecklistScreen() {
     const router = useRouter();
-    const { journalId, period, goalType, currentValue, targetValue } = useLocalSearchParams();
+    const { journalId, title, period, goalType, currentValue, targetValue } = useLocalSearchParams();
     const [checklist, setChecklist] = useState<ChecklistItem[]>([]);
     const [newItem, setNewItem] = useState("");
     const [editingIndex, setEditingIndex] = useState<number | null>(null);
@@ -81,6 +81,7 @@ export default function EditChecklistScreen() {
         if (!auth.currentUser || !journalId) return;
         try {
             const ref = doc(db, "journals", journalId as string);
+            // ⛔ startedAt 없음 → 수정 안 함
             await updateDoc(ref, {
                 checklist,
                 period: parseInt(period as string),

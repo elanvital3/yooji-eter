@@ -27,6 +27,7 @@ import { Colors } from "../../constants/Colors";
 
 type Journal = {
     id: string;
+    title: string;
     type: string;
     startWeight: number;
     startedAt: string;
@@ -39,9 +40,16 @@ type Journal = {
     targetValue: number;
 };
 
-export default function HomeScreen() {
+export default function JournalScreen() {
     const [journals, setJournals] = useState<Journal[]>([]);
     const [loading, setLoading] = useState(true);
+    // ✅ 상태 추가
+    const [showCompleted, setShowCompleted] = useState(false);
+
+    // ✅ FlatList 필터링
+    const filteredJournals = journals.filter((j) =>
+        showCompleted ? true : j.status !== "completed"
+    );
     const router = useRouter();
 
     useEffect(() => {
@@ -64,8 +72,22 @@ export default function HomeScreen() {
                 const data = docSnap.data();
                 const { point, perfectCount } = await getPointAndStars(docSnap.id);
 
+                // 자동 완료 처리
+                const startedAtDate = data.startedAt.toDate();
+                const now = new Date();
+                const endDate = new Date(startedAtDate.getTime());
+                endDate.setDate(endDate.getDate() + data.period);
+
+                if (now > endDate && data.status !== "completed") {
+                    await updateDoc(doc(db, "journals", docSnap.id), {
+                        status: "completed",
+                    });
+                    data.status = "completed";
+                }
+
                 return {
                     id: docSnap.id,
+                    title: data.title || "",
                     type: data.type,
                     startWeight: data.startWeight,
                     startedAt: data.startedAt.toDate().toISOString(),
@@ -137,10 +159,17 @@ export default function HomeScreen() {
     };
 
     const calculateDays = (startDate: string) => {
-        const start = new Date(new Date(startDate).getTime() + 9 * 60 * 60 * 1000);
-        const now = new Date(new Date().getTime() + 9 * 60 * 60 * 1000);
-        const diffTime = now.getTime() - start.getTime();
-        return Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+        const kstOffset = 9 * 60 * 60 * 1000;
+        const getKSTDateStr = (date: Date) =>
+            new Date(date.getTime() + kstOffset).toISOString().split("T")[0];
+        const start = getKSTDateStr(new Date(startDate));
+        const today = getKSTDateStr(new Date());
+        return (
+            Math.floor(
+                (new Date(today).getTime() - new Date(start).getTime()) /
+                (1000 * 60 * 60 * 24)
+            ) + 1
+        );
     };
 
     const confirmDelete = (targetId: string) => {
@@ -165,18 +194,34 @@ export default function HomeScreen() {
 
     return (
         <>
+            // ✅ Switch UI 추가 (FlatList 위에)
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Text style={{ fontFamily: "Pretendard-Bold", color: Colors.light.text, flex: 1, textAlign: "right" }}>
+                    완료된 일기 보기
+                </Text>
+                <Switch
+                    value={showCompleted}
+                    onValueChange={setShowCompleted}
+                    trackColor={{ false: "#ccc", true: Colors.light.primary }}
+                    thumbColor="#fff"
+                // style={{ flex: 1 }}
+                />
+            </View>
             {journals.length > 0 ? (
+
                 <FlatList
                     style={styles.journalContainer}
-                    data={journals}
+                    data={filteredJournals}
                     keyExtractor={(item) => item.id}
                     renderItem={({ item }) => (
                         <View
                             style={[
                                 styles.journalCard,
-                                item.status === "in_progress" && {
-                                    backgroundColor: Colors.light.lightGray,
-                                },
+                                item.status === "in_progress"
+                                    ? { backgroundColor: Colors.light.lightGray }
+                                    : item.status === "completed"
+                                        ? { backgroundColor: "#eee", opacity: 0.7 }
+                                        : {},
                             ]}
                         >
                             <TouchableOpacity
@@ -191,6 +236,9 @@ export default function HomeScreen() {
                                 <View style={styles.journalRow}>
                                     <AntDesign name="book" size={30} style={styles.bookIcon} />
                                     <View>
+                                        <Text style={styles.journalTitle}>
+                                            {item.title || "(제목 없음)"}
+                                        </Text>
                                         <Text style={styles.journalType}>
                                             {item.type} ({calculateDays(item.startedAt)} Day)
                                         </Text>
@@ -226,10 +274,16 @@ export default function HomeScreen() {
                                             })
                                         }
                                     >
-                                        <Ionicons name="create-outline" size={20} style={styles.editIcon} />
+                                        <Ionicons
+                                            name="create-outline"
+                                            size={20}
+                                            style={styles.editIcon}
+                                        />
                                     </TouchableOpacity>
 
-                                    <TouchableOpacity onPress={() => confirmDelete(item.id)}>
+                                    <TouchableOpacity
+                                        onPress={() => confirmDelete(item.id)}
+                                    >
                                         <Ionicons
                                             name="trash-outline"
                                             size={20}
@@ -248,8 +302,8 @@ export default function HomeScreen() {
                                         ? "체지방률"
                                         : item.goalType === "muscle"
                                             ? "근골격량"
-                                            : "체중"}:
-                                    {item.currentValue} → {item.targetValue}
+                                            : "체중"}
+                                    : {item.currentValue} → {item.targetValue}
                                     {item.goalType === "bodyFat" ? "%" : "kg"}
                                 </Text>
                             </View>

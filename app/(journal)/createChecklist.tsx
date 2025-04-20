@@ -17,7 +17,7 @@ import { collection, addDoc, serverTimestamp, query, where, getDocs } from "fire
 
 export default function CreateChecklistScreen() {
     const router = useRouter();
-    const { type, period, goalType, currentValue, targetValue } = useLocalSearchParams();
+    const { type, period, goalType, currentValue, targetValue, title } = useLocalSearchParams();
 
     const [checklist, setChecklist] = useState<string[]>([]);
     const [newItem, setNewItem] = useState("");
@@ -71,6 +71,7 @@ export default function CreateChecklistScreen() {
 
 
         console.log("🔥 Create Params 확인:");
+        console.log("title:", title); // 🔥 디버깅 확인
         console.log("user:", user?.uid);
         console.log("type:", type);
         console.log("period:", period);
@@ -79,7 +80,15 @@ export default function CreateChecklistScreen() {
         console.log("targetValue:", targetValue);
         console.log("checklist:", checklist);
 
-        if (!user || !type || !period || !goalType || !currentValue || !targetValue) {
+        if (
+            !user ||
+            !type ||
+            !period ||
+            !goalType ||
+            !currentValue ||
+            !targetValue ||
+            !title // 👈 추가 체크
+        ) {
             Alert.alert("오류", "필수 정보가 누락되었습니다.");
             return;
         }
@@ -97,10 +106,11 @@ export default function CreateChecklistScreen() {
             // 저장할 데이터 구성
             const docData = {
                 userId: user.uid,
+                title: title.toString(), // 👈 여기 추가
                 type,
                 checklist: checklist.map((title) => ({ title, checked: false })),
                 status: alreadyActive ? "inactive" : "in_progress",
-                startedAt: serverTimestamp(),
+                startedAt: new Date(new Date().getTime() + 9 * 60 * 60 * 1000),
                 period: parseInt(period as string),
                 goalType,
                 currentValue: parseFloat(currentValue as string),

@@ -220,10 +220,10 @@ export default function JournalDetailScreen() {
 
     if (loading || !startedAt) return <ActivityIndicator size="large" />;
 
-    const dayNumber =
-        Math.floor(
-            (selectedDate.getTime() - startedAt.getTime()) / (1000 * 60 * 60 * 24)
-        ) + 1;
+    const dayNumber = Math.floor(
+        (selectedDate.getTime() + 9 * 60 * 60 * 1000 - startedAt.getTime() - 9 * 60 * 60 * 1000) /
+        (1000 * 60 * 60 * 24)
+    ) + 1;
 
     const getWeekOfMonth = (date: Date): number => {
         const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);

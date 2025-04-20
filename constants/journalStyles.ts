@@ -106,11 +106,18 @@ export const styles = StyleSheet.create({
         marginTop: 5,
         color: Colors.light.primary
     },
-    journalType: {
+    journalTitle: {
         fontSize: 16,
         fontWeight: "bold",
         fontFamily: "Pretendard",
         color: Colors.light.primary,
+
+    },
+    journalType: {
+        fontSize: 16,
+        fontWeight: "bold",
+        fontFamily: "Pretendard",
+        color: Colors.light.text,
     },
     startDate: {
         fontSize: 14,
