@@ -83,6 +83,7 @@ export default function EditChecklistScreen() {
             const ref = doc(db, "journals", journalId as string);
             // ⛔ startedAt 없음 → 수정 안 함
             await updateDoc(ref, {
+                title, // ✅ 추가: 타이틀 저장
                 checklist,
                 period: parseInt(period as string),
                 goalType,
