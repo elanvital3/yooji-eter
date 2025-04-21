@@ -40,11 +40,21 @@ export const styles = StyleSheet.create({
     nickNameRow: {
         flexDirection: "row", // 가로로 배치
         alignItems: "center", // 세로 중앙 정렬
+        // marginRight: 40
     },
     topDday: {
         fontSize: 16,
         fontFamily: "Pretendard-Bold",
         color: Colors.light.text, // 기본 텍스트 색상
+    },
+    topTitle: {
+        position: "absolute",
+        left: 0,
+        right: 0,
+        textAlign: "center",
+        fontFamily: "Pretendard-Bold",
+        color: Colors.light.primary,
+        fontSize: 16,
     },
     topPoint: {
         flexDirection: "row", // 가로로 배치

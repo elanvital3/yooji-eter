@@ -4,7 +4,6 @@ import {
     View,
     Text,
     TouchableOpacity,
-    StyleSheet,
     ActivityIndicator,
     Alert,
     TextInput,
@@ -14,13 +13,10 @@ import { db } from "../../firebase/config";
 import {
     doc,
     getDoc,
-    updateDoc,
     setDoc,
     collection,
     getDocs,
 } from "firebase/firestore";
-import { Calendar, DateData } from "react-native-calendars";
-import { Colors } from "../../constants/Colors"; // Colors 임포트
 import { styles } from "../../constants/mainStyles"
 import { format, startOfWeek, addDays } from 'date-fns';
 import { ko } from 'date-fns/locale';
@@ -55,11 +51,13 @@ export default function JournalDetailScreen() {
     const [point, setPoint] = useState(0);
     const [weekDates, setWeekDates] = useState<WeekDay[]>([]);
     const [completedDays, setCompletedDays] = useState<Record<string, boolean>>({});
+    const [period, setPeriod] = useState<number | null>(null);
 
     const [goalType, setGoalType] = useState("");
     const [currentValue, setCurrentValue] = useState<number | null>(null);
     const [targetValue, setTargetValue] = useState<number | null>(null);
     const [newTarget, setNewTarget] = useState<string>("");
+    const [hasMeasurement, setHasMeasurement] = useState(false); // ✅ 수치 입력 여부 추적
 
 
     const getKSTDateKey = (date: Date) => {
@@ -87,6 +85,7 @@ export default function JournalDetailScreen() {
             setGoalType(journalData.goalType);
             setCurrentValue(journalData.currentValue);
             setTargetValue(journalData.targetValue);
+            setPeriod(journalData.period); // ✅ 추가
 
             // 총 점수 계산
             const logsSnapshot = await getDocs(collection(db, `journals/${journalId}/dailyLogs`));
@@ -105,11 +104,21 @@ export default function JournalDetailScreen() {
             const dailySnap = await getDoc(dailyLogRef);
 
             if (dailySnap.exists()) {
-                setChecklist(dailySnap.data().checklist);
+                const data = dailySnap.data();
+                setChecklist(data.checklist);
 
-                const allChecked = dailySnap.data().checklist.every((item: ChecklistItem) => item.checked);
+                const allChecked = data.checklist.every((item: ChecklistItem) => item.checked);
                 const key = getKSTDateKey(selectedDate);
                 setCompletedDays(prev => ({ ...prev, [key]: allChecked }));
+
+                // ✅ 수치 입력 상태 반영
+                if (data.dailyMeasurement !== undefined) {
+                    setNewTarget(data.dailyMeasurement.toString());
+                    setHasMeasurement(true);
+                } else {
+                    setNewTarget("");
+                    setHasMeasurement(false);
+                }
             } else {
                 const baseChecklist: ChecklistItem[] = journalData.checklist.map(
                     (item: ChecklistItem) => ({
@@ -118,6 +127,10 @@ export default function JournalDetailScreen() {
                     })
                 );
                 setChecklist(baseChecklist);
+
+                // ✅ 수치 초기화
+                setNewTarget("");
+                setHasMeasurement(false);
             }
 
             setLoading(false);
@@ -130,13 +143,18 @@ export default function JournalDetailScreen() {
         if (!newTarget || !journalId) return;
         try {
             const ref = doc(db, `journals/${journalId}/dailyLogs/${dateKey}`);
+            const numericValue = parseFloat(newTarget);
+
             await setDoc(ref, {
                 checklist,
                 completedAt: new Date(),
-                dailyMeasurement: parseFloat(newTarget),
+                dailyMeasurement: numericValue,
             }, { merge: true });
 
-            setNewTarget("");
+            // ✅ 저장 후 상태 반영
+            setNewTarget(numericValue.toString());
+            setHasMeasurement(true);
+
             Alert.alert("성공", "오늘 수치가 저장되었습니다.");
         } catch (err) {
             console.error("오늘 수치 저장 실패:", err);
@@ -236,9 +254,6 @@ export default function JournalDetailScreen() {
         baseDate.getMonth() + 1
     ).padStart(2, "0")} (${getWeekOfMonth(baseDate)}W)`;
 
-    const formattedWeekLabel = `${selectedDate.getFullYear()}-${String(
-        selectedDate.getMonth() + 1
-    ).padStart(2, "0")} (${getWeekOfMonth(selectedDate)}W)`;
 
     return (
         <>
@@ -284,7 +299,7 @@ export default function JournalDetailScreen() {
 
             <View style={styles.progressBarContainer}>
                 <Text style={styles.goalLabel}>
-                    📋 Check List
+                    📋 Check List ({dayNumber}일차 /{period})
                 </Text>
                 <View style={styles.progressBarBackground}>
                     <View
@@ -315,13 +330,9 @@ export default function JournalDetailScreen() {
                         onPress={() => toggleItem(index)}
                     >
                         <Text style={[styles.itemText, item.checked && {
-                            // textDecorationLine: 'line-through'
                         }]}>
                             {item.title}
                         </Text>
-                        {/* <Text style={[styles.itemText, item.checked && styles.checked]}>
-                            {item.checked ? "✅" : "⬜"}
-                        </Text> */}
                         <View style={styles.radioOuter}>
                             {item.checked && <View style={styles.radioInner} />}
                         </View>
@@ -338,15 +349,24 @@ export default function JournalDetailScreen() {
                     <View style={styles.goalRow}>
                         <TextInput
                             value={newTarget}
-                            onChangeText={setNewTarget}
+                            onChangeText={(text) => {
+                                setNewTarget(text);
+                                setHasMeasurement(false); // 입력 수정 시 상태 리셋
+                            }}
                             placeholder={`오늘 수치 (${goalType === 'bodyFat' ? '%' : 'kg'})`}
                             keyboardType="numeric"
                             style={styles.goalInput}
                         />
                         <TouchableOpacity onPress={handleSaveDailyMeasurement} style={styles.savebutton}>
-                            <Text style={styles.saveText}>저장</Text>
+                            <Text style={styles.saveText}>{hasMeasurement ? "수정" : "저장"}</Text>
                         </TouchableOpacity>
                     </View>
+
+                    {/* {hasMeasurement && (
+                        <Text style={{ marginTop: 6, fontFamily: "Pretendard", color: Colors.light.primary }}>
+                            ✅ 오늘 수치가 입력되어 있어요
+                        </Text>
+                    )} */}
                 </View>
             )}
 

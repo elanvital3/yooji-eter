@@ -22,7 +22,7 @@ export default function SetGoalScreen() {
 
     const handleNext = () => {
         router.push({
-            pathname: "/(journal)/selectDietType",
+            pathname: "/(journal)/createChecklist",
             params: {
                 title, // ✅ 함께 넘기기
                 period,
@@ -35,12 +35,12 @@ export default function SetGoalScreen() {
 
     return (
         <View style={styles.journalContainer}>
-            <Text style={styles.label}>저널 이름</Text>
+            <Text style={styles.label}>챌린지 이름</Text>
             <TextInput
                 style={styles.input}
                 value={title}
                 onChangeText={setTitle}
-                placeholder="예: 체지방 컷 30일 챌린지"
+                placeholder="예: 스위치온 4주 챌린지"
             />
 
             <Text style={styles.label}>챌린지 기간 (일)</Text>

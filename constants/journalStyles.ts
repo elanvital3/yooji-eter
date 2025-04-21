@@ -6,7 +6,7 @@ export const styles = StyleSheet.create({
     // ✅ main 화면
     mainContainer: {
         flex: 1,
-        // backgroundColor: Colors.light.,
+        backgroundColor: Colors.light.background,
         justifyContent: "space-between",  // 캐릭터가 화면 상단에 오도록
         alignItems: "center",          // 수평 중앙 정렬
         paddingHorizontal: 12,
@@ -83,13 +83,38 @@ export const styles = StyleSheet.create({
         width: "100%",
         flexGrow: 0,
     },
-    journalRow: {
+    journalHead: {
         flexDirection: "row",
-        alignItems: "center"
+        // elevation: 10, // 안드로이드 전용 그림자 깊이
+        // backgroundColor: Colors.light.primary, // elevation은 배경색이 있어야 보임
+        borderRadius: 10,
+        padding: 8,
+        borderWidth: 1,
+        borderColor: "#ddd",
+        borderBottomLeftRadius: 0, // ✅ 이거!
+        borderBottomRightRadius: 0,
+        justifyContent: "space-between",
+        alignItems: "center",
+    },
+
+    journalTitleRow: {
+        flexDirection: "row",
+        alignItems: "flex-start",
+    },
+
+    journalHeadBookIcon: {
+        marginRight: 5,
+        color: Colors.light.text,
+        // marginTop: 5,
+    },
+    journalHeadTitle: {
+        color: Colors.light.text,
+        fontFamily: "Pretendard-Bold",
+        fontSize: 16,
     },
 
     journalCard: {
-        flexDirection: "row",
+        // flexDirection: "row",
         elevation: 2, // 안드로이드 전용 그림자 깊이
         backgroundColor: '#fff', // elevation은 배경색이 있어야 보임
         borderRadius: 10, // 모서리 둥글게 (선택)
@@ -98,18 +123,20 @@ export const styles = StyleSheet.create({
         justifyContent: "space-between",
         padding: 10,
         borderWidth: 1,
-        borderColor: "#eee",
+        borderColor: "#ddd",
         marginBottom: 12, // 카드 간격 줄임     
+        borderTopLeftRadius: 0, // ✅ 이거!
+        borderTopRightRadius: 0, // ✅ 이거!
     },
-    bookIcon: {
-        marginRight: 5,
-        marginTop: 5,
-        color: Colors.light.primary
+    journalRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        marginBottom: 5
     },
     journalTitle: {
         fontSize: 16,
-        fontWeight: "bold",
-        fontFamily: "Pretendard",
+        fontFamily: "Pretendard-Bold",
         color: Colors.light.primary,
 
     },
@@ -124,6 +151,39 @@ export const styles = StyleSheet.create({
         color: Colors.light.text, // 회색 D-Day
         // fontFamily: "Pretendard-Bold",
     },
+
+    // ✅ 저널메트릭
+    metricCard: {
+        height: 100,
+        width: "30%",
+        elevation: 4, // 안드로이드 전용 그림자 깊이
+        backgroundColor: '#fff', // elevation은 배경색이 있어야 보임
+        borderRadius: 10,
+        borderColor: "#ddd",
+        borderWidth: 1,
+        justifyContent: "space-evenly",
+        alignItems: "center"
+    },
+
+    metricTitle: {
+        fontSize: 20,
+        color: Colors.light.text, // 회색 D-Day
+        fontFamily: "Pretendard-Bold",
+        borderBottomWidth: 1,
+        borderBottomColor: "#ddd",
+        paddingBottom: 5,
+        width: "80%",
+        textAlign: "center",
+
+    },
+
+    metricNumber: {
+        fontSize: 20,
+        color: Colors.light.primary, // 회색 D-Day
+        fontFamily: "Pretendard-Bold",
+        paddingBottom: 5
+    },
+
 
 
     // ✅ 토글관련

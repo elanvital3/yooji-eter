@@ -76,7 +76,7 @@ export default function BottomTabBar() {
                         isActive("journal") && styles.activeTabLabel,
                     ]}
                 >
-                    저널
+                    챌린지
                 </Text>
             </TouchableOpacity>
 

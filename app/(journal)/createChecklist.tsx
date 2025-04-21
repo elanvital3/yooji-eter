@@ -15,6 +15,13 @@ import { Ionicons } from "@expo/vector-icons";
 import { auth, db } from "../../firebase/config";
 import { collection, addDoc, serverTimestamp, query, where, getDocs } from "firebase/firestore";
 
+const dietOptions = [
+    { key: "switch_on", label: "스위치온" },
+    { key: "low_carb", label: "저탄고지" },
+    { key: "vegetarian", label: "채식" },
+    { key: "custom", label: "나만의 체크리스트" },
+];
+
 export default function CreateChecklistScreen() {
     const router = useRouter();
     const { type, period, goalType, currentValue, targetValue, title } = useLocalSearchParams();
@@ -23,17 +30,19 @@ export default function CreateChecklistScreen() {
     const [newItem, setNewItem] = useState("");
     const [editingIndex, setEditingIndex] = useState<number | null>(null);
     const [editingText, setEditingText] = useState("");
+    const [selectedType, setSelectedType] = useState<string>(type?.toString() || "switch_on");
 
     const preset: Record<string, string[]> = {
         switch_on: ["운동", "저녁 무탄수 식단", "금주", "공복 14시간", "액상과당 섭취 X", "물 2L 섭취", "밀가루, 튀김음식 섭취 X", "7시간 숙면"],
         low_carb: ["탄수화물 20g 이하", "지방 위주 식단", "공복 16시간", "스트레칭 10분 이상"],
-        vegetarian: ["육류 섭취 X", "야채 위주 식단", "탄수화물 균형 유지", "유제품 적당량 섭취"]
+        vegetarian: ["육류 섭취 X", "야채 위주 식단", "탄수화물 균형 유지", "유제품 적당량 섭취"],
+        custom: [],
     };
 
     useEffect(() => {
-        const initial = preset[type as string] || [];
+        const initial = preset[selectedType] || [];
         setChecklist(initial);
-    }, [type]);
+    }, [selectedType]);
 
     const handleRemove = (index: number) => {
         const updated = [...checklist];
@@ -69,32 +78,12 @@ export default function CreateChecklistScreen() {
     const handleCreate = async () => {
         const user = auth.currentUser;
 
-
-        console.log("🔥 Create Params 확인:");
-        console.log("title:", title); // 🔥 디버깅 확인
-        console.log("user:", user?.uid);
-        console.log("type:", type);
-        console.log("period:", period);
-        console.log("goalType:", goalType);
-        console.log("currentValue:", currentValue);
-        console.log("targetValue:", targetValue);
-        console.log("checklist:", checklist);
-
-        if (
-            !user ||
-            !type ||
-            !period ||
-            !goalType ||
-            !currentValue ||
-            !targetValue ||
-            !title // 👈 추가 체크
-        ) {
+        if (!user || !selectedType || !period || !goalType || !currentValue || !targetValue || !title) {
             Alert.alert("오류", "필수 정보가 누락되었습니다.");
             return;
         }
 
         try {
-            // 현재 활성화된 저널이 있는지 확인
             const q = query(
                 collection(db, "journals"),
                 where("userId", "==", user.uid),
@@ -103,11 +92,10 @@ export default function CreateChecklistScreen() {
             const snapshot = await getDocs(q);
             const alreadyActive = !snapshot.empty;
 
-            // 저장할 데이터 구성
             const docData = {
                 userId: user.uid,
-                title: title.toString(), // 👈 여기 추가
-                type,
+                title: title.toString(),
+                type: selectedType,
                 checklist: checklist.map((title) => ({ title, checked: false })),
                 status: alreadyActive ? "inactive" : "in_progress",
                 startedAt: new Date(new Date().getTime() + 9 * 60 * 60 * 1000),
@@ -127,10 +115,28 @@ export default function CreateChecklistScreen() {
 
     return (
         <View style={styles.journalContainer}>
-            <Text style={styles.title}>체크리스트를 수정해주세요</Text>
+            <Text style={styles.label}>다이어트 유형 선택</Text>
+            <View style={styles.radioRow}>
+                {dietOptions.map((option) => (
+                    <TouchableOpacity
+                        key={option.key}
+                        onPress={() => setSelectedType(option.key)}
+                        style={[styles.radioButton, selectedType === option.key && styles.radioSelected]}
+                    >
+                        <Text
+                            style={[styles.radioText, selectedType === option.key && styles.selectedText]}
+                        >
+                            {option.label}
+                        </Text>
+                    </TouchableOpacity>
+                ))}
+            </View>
+
+            {/* <Text style={styles.title}>체크리스트를 수정해주세요</Text> */}
             <FlatList
                 data={checklist}
                 keyExtractor={(_, index) => index.toString()}
+                style={{ marginTop: 10 }}
                 renderItem={({ item, index }) => (
                     <View style={styles.checkListRow}>
                         {editingIndex === index ? (
@@ -174,7 +180,7 @@ export default function CreateChecklistScreen() {
             </View>
 
             <TouchableOpacity style={styles.startButton} onPress={handleCreate}>
-                <Text style={styles.startButtonText}>유지일기 시작하기</Text>
+                <Text style={styles.startButtonText}>챌린지 시작하기</Text>
             </TouchableOpacity>
         </View>
     );

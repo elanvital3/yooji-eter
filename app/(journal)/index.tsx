@@ -194,10 +194,10 @@ export default function JournalScreen() {
 
     return (
         <>
-            // ✅ Switch UI 추가 (FlatList 위에)
+            {/* ✅ Switch UI 추가 (FlatList 위에) */}
             <View style={{ flexDirection: "row", alignItems: "center" }}>
                 <Text style={{ fontFamily: "Pretendard-Bold", color: Colors.light.text, flex: 1, textAlign: "right" }}>
-                    완료된 일기 보기
+                    완료된 챌린지 보기
                 </Text>
                 <Switch
                     value={showCompleted}
@@ -214,41 +214,22 @@ export default function JournalScreen() {
                     data={filteredJournals}
                     keyExtractor={(item) => item.id}
                     renderItem={({ item }) => (
-                        <View
-                            style={[
-                                styles.journalCard,
-                                item.status === "in_progress"
-                                    ? { backgroundColor: Colors.light.lightGray }
-                                    : item.status === "completed"
-                                        ? { backgroundColor: "#eee", opacity: 0.7 }
-                                        : {},
-                            ]}
-                        >
-                            <TouchableOpacity
-                                style={{ flex: 1 }}
-                                onPress={() =>
-                                    router.push({
-                                        pathname: "/(main)",
-                                        params: { journalId: item.id },
-                                    })
-                                }
-                            >
-                                <View style={styles.journalRow}>
-                                    <AntDesign name="book" size={30} style={styles.bookIcon} />
-                                    <View>
-                                        <Text style={styles.journalTitle}>
-                                            {item.title || "(제목 없음)"}
-                                        </Text>
-                                        <Text style={styles.journalType}>
-                                            {item.type} ({calculateDays(item.startedAt)} Day)
-                                        </Text>
-                                        <Text style={styles.startDate}>
-                                            시작일 : {format(new Date(item.startedAt), "yy-MM-dd")}
-                                        </Text>
-                                    </View>
+                        <>
+                            <View style={[styles.journalHead,
+                            item.status === "in_progress"
+                                ? { backgroundColor: Colors.light.primary }
+                                : item.status === "completed"
+                                    ? { backgroundColor: "#eee", opacity: 0.7 }
+                                    : {},
+                            ]}>
+                                <View style={styles.journalTitleRow}>
+                                    <AntDesign name="book" size={24} style={[styles.journalHeadBookIcon, item.status === "in_progress" && { color: "#fff" }]} />
+                                    <Text style={[styles.journalHeadTitle, item.status === "in_progress" && { color: "#fff" }]}>
+                                        {item.title || "(제목 없음)"}
+                                    </Text>
                                 </View>
-                            </TouchableOpacity>
-                            <View style={{ alignItems: "flex-end" }}>
+
+
                                 <View style={styles.controlRow}>
                                     <Switch
                                         value={item.status === "in_progress"}
@@ -261,7 +242,7 @@ export default function JournalScreen() {
                                         }}
                                         trackColor={{
                                             false: "#d3d3d3",
-                                            true: Colors.light.primary,
+                                            true: "#fff",
                                         }}
                                         thumbColor="#ffffff"
                                     />
@@ -277,7 +258,7 @@ export default function JournalScreen() {
                                         <Ionicons
                                             name="create-outline"
                                             size={20}
-                                            style={styles.editIcon}
+                                            style={[styles.editIcon, item.status === "in_progress" && { color: "#fff" }]}
                                         />
                                     </TouchableOpacity>
 
@@ -287,38 +268,89 @@ export default function JournalScreen() {
                                         <Ionicons
                                             name="trash-outline"
                                             size={20}
-                                            style={styles.deleteIcon}
+                                            style={[styles.deleteIcon, item.status === "in_progress" && { color: "#fff" }]}
                                         />
                                     </TouchableOpacity>
                                 </View>
-                                <Text style={styles.startDate}>
-                                    🔥 {item.point} pt  |  🌟 {item.perfectCount}
-                                </Text>
-                                <Text style={styles.startDate}>
-                                    ⏳ {calculateDays(item.startedAt)} / {item.period}일 진행 중
-                                </Text>
-                                <Text style={styles.startDate}>
-                                    🎯 목표 {item.goalType === "bodyFat"
-                                        ? "체지방률"
-                                        : item.goalType === "muscle"
-                                            ? "근골격량"
-                                            : "체중"}
-                                    : {item.currentValue} → {item.targetValue}
-                                    {item.goalType === "bodyFat" ? "%" : "kg"}
-                                </Text>
                             </View>
-                        </View>
+
+
+                            <View
+                                style={[styles.journalCard]}
+                            >
+                                <TouchableOpacity
+                                    style={{ flex: 1 }}
+                                    onPress={() =>
+                                        router.push({
+                                            pathname: "/(main)",
+                                            params: { journalId: item.id },
+                                        })
+                                    }
+                                >
+                                    <View style={styles.journalRow}>
+                                        <Text style={styles.journalType}>
+                                            {item.type}
+                                        </Text>
+                                        <Text style={styles.startDate}>
+                                            시작일 : {format(new Date(item.startedAt), "yy-MM-dd")}
+                                        </Text>
+                                    </View>
+
+
+
+                                    <View style={{ flexDirection: "row", justifyContent: "space-between", gap: 20 }}>
+                                        <View style={styles.metricCard}>
+                                            <Text style={styles.metricTitle}>
+                                                🔥 / 🌟
+                                            </Text>
+                                            <Text style={styles.metricNumber}>
+                                                {item.point} / {item.perfectCount}
+                                            </Text>
+                                        </View>
+                                        <View style={styles.metricCard}>
+                                            <Text style={styles.metricTitle}>
+                                                ⏳
+                                            </Text>
+                                            <Text style={styles.metricNumber}>
+                                                {calculateDays(item.startedAt)} / {item.period}일
+                                            </Text>
+                                        </View>
+                                        <View style={styles.metricCard}>
+                                            <Text style={styles.metricTitle}>
+                                                🎯 {item.goalType === "bodyFat"
+                                                    ? "지방률"
+                                                    : item.goalType === "muscle"
+                                                        ? "근육량"
+                                                        : "체중"}
+                                                {/* {item.goalType === "bodyFat" ? "%" : "kg"} */}
+
+                                            </Text>
+                                            <Text style={styles.metricNumber}>
+                                                {item.currentValue} / {item.targetValue}
+
+                                            </Text>
+                                        </View>
+
+
+                                    </View>
+                                </TouchableOpacity>
+
+
+
+
+                            </View>
+                        </>
                     )}
                 />
             ) : (
-                <Text style={styles.title}>진행 중인 유지일기가 없습니다.</Text>
+                <Text style={styles.title}>진행 중인 챌린지가 없습니다.</Text>
             )}
 
             <TouchableOpacity
                 style={styles.startButton}
                 onPress={() => router.push("/(journal)/setGoal")}
             >
-                <Text style={styles.startButtonText}>유지일기 생성하기</Text>
+                <Text style={styles.startButtonText}>챌린지 생성하기</Text>
             </TouchableOpacity>
         </>
     );

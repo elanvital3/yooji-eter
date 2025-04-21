@@ -65,7 +65,7 @@ export default function EditGoalScreen() {
 
     return (
         <View style={styles.journalContainer}>
-            <Text style={styles.label}>일기 이름</Text>
+            <Text style={styles.label}>챌린지 이름</Text>
             <TextInput
                 style={styles.input}
                 value={title}
@@ -73,7 +73,7 @@ export default function EditGoalScreen() {
                 placeholder="예: 4월 달성 참여하기"
             />
 
-            <Text style={styles.label}>차량지 기간 (일)</Text>
+            <Text style={styles.label}>챌린지 기간 (일)</Text>
             <TextInput
                 style={styles.input}
                 keyboardType="numeric"
