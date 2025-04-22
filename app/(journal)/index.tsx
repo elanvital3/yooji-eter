@@ -322,11 +322,10 @@ export default function JournalScreen() {
                                                     : item.goalType === "muscle"
                                                         ? "근육량"
                                                         : "체중"}
-                                                {/* {item.goalType === "bodyFat" ? "%" : "kg"} */}
 
                                             </Text>
                                             <Text style={styles.metricNumber}>
-                                                {item.currentValue} / {item.targetValue}
+                                                {item.currentValue} / {item.targetValue}{item.goalType === "bodyFat" ? "%" : "kg"}
 
                                             </Text>
                                         </View>
