@@ -155,7 +155,7 @@ export const styles = StyleSheet.create({
     // ✅ 저널메트릭
     metricCard: {
         height: 100,
-        width: "30%",
+        width: "32%",
         elevation: 4, // 안드로이드 전용 그림자 깊이
         backgroundColor: '#fff', // elevation은 배경색이 있어야 보임
         borderRadius: 10,

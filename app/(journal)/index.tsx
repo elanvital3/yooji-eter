@@ -298,7 +298,7 @@ export default function JournalScreen() {
 
 
 
-                                    <View style={{ flexDirection: "row", justifyContent: "space-between", gap: 20 }}>
+                                    <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
                                         <View style={styles.metricCard}>
                                             <Text style={styles.metricTitle}>
                                                 🔥 / 🌟
